@@ -7,12 +7,8 @@ namespace RepeatableExecutionsTests.Attributes
     {
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-
             CorrelationIdManager.Initialize();
-            Console.WriteLine(CorrelationIdManager.GetCurrentCorrelationId());
-            Console.WriteLine("AsyncActionFilter: Before method call");
             await next();
-            Console.WriteLine("AsyncActionFilter: After method call");
         }
     }
 }

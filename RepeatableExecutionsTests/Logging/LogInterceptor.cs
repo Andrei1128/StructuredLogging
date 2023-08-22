@@ -1,5 +1,6 @@
 ﻿using Castle.DynamicProxy;
 using RepeatableExecutionsTests.Attributes;
+using RepeatableExecutionsTests.Helpers;
 using System.Reflection;
 
 namespace RepeatableExecutionsTests.Logging
@@ -9,21 +10,28 @@ namespace RepeatableExecutionsTests.Logging
         public void Intercept(IInvocation invocation)
         {
             var method = invocation.MethodInvocationTarget ?? invocation.Method;
-
-            var logAttribute = method.GetCustomAttribute<LogAttribute>();
-
-            if (logAttribute != null)
+            if (CorrelationIdManager.GetCurrentCorrelationId() != Guid.Empty)
             {
-                var methodName = $"{method.DeclaringType.Name}.{method.Name}";
-                logAttribute.LogBefore(methodName);
+                var logAttribute = method.GetCustomAttribute<LogAttribute>();
+
+                if (logAttribute != null)
+                {
+                    var arguments = invocation.Arguments;
+                    logAttribute.LogBefore(arguments);
+                }
+
+                invocation.Proceed();
+
+                if (logAttribute != null)
+                {
+                    var returnValue = invocation.ReturnValue;
+
+                    logAttribute.LogAfter(returnValue);
+                }
             }
-
-            invocation.Proceed();
-
-            if (logAttribute != null)
+            else
             {
-                var methodName = $"{method.DeclaringType.Name}.{method.Name}";
-                logAttribute.LogAfter(methodName);
+                invocation.Proceed();
             }
         }
     }

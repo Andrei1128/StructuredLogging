@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using RepeatableExecutionsTests.Attributes;
-using RepeatableExecutionsTests.Entities;
 using RepeatableExecutionsTests.Services;
 
 namespace RepeatableExecutionsTests.Controllers
@@ -16,9 +14,9 @@ namespace RepeatableExecutionsTests.Controllers
         }
         [StructuredLogging]
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public string Get()
         {
-            return _weatherForecastService.Get();
+            return _weatherForecastService.Get("asdasdasd", 12);
         }
     }
 }

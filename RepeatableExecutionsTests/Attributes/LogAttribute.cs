@@ -1,16 +1,20 @@
-﻿namespace RepeatableExecutionsTests.Attributes
+﻿using System.Text.Json;
+
+namespace RepeatableExecutionsTests.Attributes
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
     public class LogAttribute : Attribute
     {
-        public void LogBefore(string methodName)
+        public void LogBefore(object[] arguments)
         {
-            Console.WriteLine($"Before executing {methodName}.");
+            string serializedInput = JsonSerializer.Serialize(arguments);
+            Console.WriteLine($"Input: {serializedInput}");
         }
 
-        public void LogAfter(string methodName)
+        public void LogAfter(object returnValue)
         {
-            Console.WriteLine($"After executing {methodName}.");
+            string serializedOutput = JsonSerializer.Serialize(returnValue);
+            Console.WriteLine($"Output: {serializedOutput}");
         }
     }
 }
