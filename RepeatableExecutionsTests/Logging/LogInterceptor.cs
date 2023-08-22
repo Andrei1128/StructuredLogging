@@ -14,18 +14,21 @@ namespace RepeatableExecutionsTests.Logging
             {
                 var logAttribute = method.GetCustomAttribute<LogAttribute>();
 
-                if (logAttribute != null)
+                if (logAttribute == null)
                 {
+                    invocation.Proceed();
+                }
+                else
+                {
+                    // Before execution
                     var arguments = invocation.Arguments;
                     logAttribute.LogBefore(arguments);
-                }
 
-                invocation.Proceed();
+                    //Execution
+                    invocation.Proceed();
 
-                if (logAttribute != null)
-                {
+                    //After execution
                     var returnValue = invocation.ReturnValue;
-
                     logAttribute.LogAfter(returnValue);
                 }
             }
