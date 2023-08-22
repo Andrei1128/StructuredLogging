@@ -70,19 +70,14 @@ Delegate ToDelegate(Type type, MethodInfo methodInfo)
 void ModifyMethod(Type type, MethodInfo methodInfo)
 {
     var originalMethodDelegate = ToDelegate(type, methodInfo);
-    var originalMethod = Delegate.CreateDelegate(
-        originalMethodDelegate.GetType(),
-        originalMethodDelegate.Target,
-        originalMethodDelegate.Method
-    );
 
     Action modifiedMethod = () =>
     {
         Console.WriteLine($"Logging Before {methodInfo.Name}");
-        originalMethod.DynamicInvoke();
+        originalMethodDelegate.DynamicInvoke();
         Console.WriteLine($"Logging After {methodInfo.Name}");
     };
-
+    //Problem here!
     var delegateHolderField = type.GetField(
         methodInfo.Name,
         BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public

@@ -9,6 +9,7 @@ namespace RepeatableExecutionsTests.Services
         [Log]
         public IEnumerable<WeatherForecast> Get()
         {
+            Console.WriteLine("In Get Method");
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
