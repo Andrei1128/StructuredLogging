@@ -1,4 +1,4 @@
-using RepeatableExecutionsTests.Services;
+using RepeatableExecutionsTests.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +6,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IWeatherForecastService, WeatherForecastService>();
+//builder.Services.AddScoped<IWeatherForecastService, WeatherForecastService>();
+
+builder.Services.AddLoggingInterceptor();
 
 var app = builder.Build();
 
