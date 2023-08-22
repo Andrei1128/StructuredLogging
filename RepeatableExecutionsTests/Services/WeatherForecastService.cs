@@ -1,10 +1,10 @@
-﻿using RepeatableExecutionsTests.Consts;
+﻿using RepeatableExecutionsTests.Attributes;
+using RepeatableExecutionsTests.Consts;
 using RepeatableExecutionsTests.Entities;
-using StructuredLogging.Attributes;
 
 namespace RepeatableExecutionsTests.Services
 {
-    public class WeatherForecastService
+    public class WeatherForecastService : IWeatherForecastService
     {
         [Log]
         public IEnumerable<WeatherForecast> Get()
@@ -18,5 +18,9 @@ namespace RepeatableExecutionsTests.Services
             })
             .ToArray();
         }
+    }
+    public interface IWeatherForecastService
+    {
+        public IEnumerable<WeatherForecast> Get();
     }
 }

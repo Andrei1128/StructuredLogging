@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using RepeatableExecutionsTests.Attributes;
 using RepeatableExecutionsTests.Entities;
 using RepeatableExecutionsTests.Services;
-using StructuredLogging.Attributes;
 
 namespace RepeatableExecutionsTests.Controllers
 {
@@ -9,10 +9,10 @@ namespace RepeatableExecutionsTests.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private WeatherForecastService _weatherForecastService;
-        public WeatherForecastController()
+        private IWeatherForecastService _weatherForecastService;
+        public WeatherForecastController(IWeatherForecastService weatherForecastService)
         {
-            _weatherForecastService = new WeatherForecastService();
+            _weatherForecastService = weatherForecastService;
         }
         [StructuredLogging]
         [HttpGet]
