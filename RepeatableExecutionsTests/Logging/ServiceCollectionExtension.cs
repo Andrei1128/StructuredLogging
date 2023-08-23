@@ -1,29 +1,49 @@
 ﻿using Castle.DynamicProxy;
-using RepeatableExecutionsTests.Services;
 
 namespace RepeatableExecutionsTests.Logging
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddLoggingInterceptor(this IServiceCollection services)
+        public static IServiceCollection Decorate<TService, TImplementation>(this IServiceCollection services, ServiceLifetime lifetime)
+        where TService : class
+        where TImplementation : class, TService
         {
-            services.AddScoped<LogInterceptor>();
+            switch (lifetime)
+            {
+                case ServiceLifetime.Transient:
+                    services.AddTransient<TImplementation>();
+                    break;
+                case ServiceLifetime.Singleton:
+                    services.AddSingleton<TImplementation>();
+                    break;
+                case ServiceLifetime.Scoped:
+                default:
+                    services.AddScoped<TImplementation>();
+                    break;
+            }
+
             services.AddSingleton(provider =>
             {
                 return new ProxyGenerator();
             });
+            services.AddScoped<LogInterceptor>();
 
-            services.AddScoped<IWeatherForecastService>(provider =>
-            {
-                var proxyGenerator = provider.GetRequiredService<ProxyGenerator>();
-                var logInterceptor = provider.GetRequiredService<LogInterceptor>();
+            services.Add(ServiceDescriptor.Describe(
+                typeof(TService),
+                provider =>
+                {
+                    var proxyGenerator = provider.GetRequiredService<ProxyGenerator>();
+                    var logInterceptor = provider.GetRequiredService<LogInterceptor>();
+                    var implementationInstance = provider.GetRequiredService<TImplementation>();
 
-                var myService = new WeatherForecastService();
-                var proxy = proxyGenerator.CreateInterfaceProxyWithTarget<IWeatherForecastService>(myService, logInterceptor);
-                return proxy;
-            });
+                    var proxy = proxyGenerator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, logInterceptor);
+                    return proxy;
+                },
+                lifetime
+            ));
 
             return services;
         }
     }
+
 }

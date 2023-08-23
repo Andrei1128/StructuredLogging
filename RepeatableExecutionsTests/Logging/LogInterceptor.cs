@@ -13,7 +13,6 @@ namespace RepeatableExecutionsTests.Logging
             if (CorrelationIdManager.GetCurrentCorrelationId() != Guid.Empty)
             {
                 var logAttribute = method.GetCustomAttribute<LogAttribute>();
-
                 if (logAttribute == null)
                 {
                     invocation.Proceed();
@@ -24,12 +23,20 @@ namespace RepeatableExecutionsTests.Logging
                     var arguments = invocation.Arguments;
                     logAttribute.LogBefore(arguments);
 
-                    //Execution
-                    invocation.Proceed();
+                    try
+                    {
+                        // Execution
+                        invocation.Proceed();
 
-                    //After execution
-                    var returnValue = invocation.ReturnValue;
-                    logAttribute.LogAfter(returnValue);
+                        // After execution
+                        var returnValue = invocation.ReturnValue;
+                        logAttribute.LogAfter(returnValue);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Error handling
+                        logAttribute.LogAfter(ex.ToString());
+                    }
                 }
             }
             else

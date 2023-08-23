@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RepeatableExecutionsTests.Attributes;
 using RepeatableExecutionsTests.Services;
 
 namespace RepeatableExecutionsTests.Controllers
@@ -8,15 +9,23 @@ namespace RepeatableExecutionsTests.Controllers
     public class WeatherForecastController : ControllerBase
     {
         private IWeatherForecastService _weatherForecastService;
-        public WeatherForecastController(IWeatherForecastService weatherForecastService)
+        private IWeatherForecastService2 _weatherForecastService2;
+        public WeatherForecastController(IWeatherForecastService weatherForecastService, IWeatherForecastService2 weatherForecastService2)
         {
             _weatherForecastService = weatherForecastService;
+            _weatherForecastService2 = weatherForecastService2;
         }
         [StructuredLogging]
-        [HttpGet]
-        public string Get()
+        [HttpPost]
+        public string Get([FromBody] int payload)
         {
-            return _weatherForecastService.Get("asdasdasd", 12);
+            return _weatherForecastService.Get("asdasd", 12);
+        }
+        [StructuredLogging]
+        [HttpPut]
+        public string Get2([FromBody] int payload)
+        {
+            return _weatherForecastService2.Get("asdasd", 12);
         }
     }
 }
