@@ -7,8 +7,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.Decorate<IWeatherForecastService, WeatherForecastService>(ServiceLifetime.Scoped);
-builder.Services.Decorate<IWeatherForecastService2, WeatherForecastService2>(ServiceLifetime.Scoped);
+builder.Services.InitializeLogging();
+
+builder.Services.AddLogging<IWeatherForecastService, WeatherForecastService>(ServiceLifetime.Scoped);
+builder.Services.AddLogging<IWeatherForecastService2, WeatherForecastService2>(ServiceLifetime.Scoped);
 
 var app = builder.Build();
 

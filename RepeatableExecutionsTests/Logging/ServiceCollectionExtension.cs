@@ -4,7 +4,7 @@ namespace RepeatableExecutionsTests.Logging
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection Decorate<TService, TImplementation>(this IServiceCollection services, ServiceLifetime lifetime)
+        public static IServiceCollection AddLogging<TService, TImplementation>(this IServiceCollection services, ServiceLifetime lifetime)
         where TService : class
         where TImplementation : class, TService
         {
@@ -21,13 +21,6 @@ namespace RepeatableExecutionsTests.Logging
                     services.AddScoped<TImplementation>();
                     break;
             }
-
-            services.AddSingleton(provider =>
-            {
-                return new ProxyGenerator();
-            });
-            services.AddScoped<LogInterceptor>();
-
             services.Add(ServiceDescriptor.Describe(
                 typeof(TService),
                 provider =>
@@ -42,6 +35,15 @@ namespace RepeatableExecutionsTests.Logging
                 lifetime
             ));
 
+            return services;
+        }
+        public static IServiceCollection InitializeLogging(this IServiceCollection services)
+        {
+            services.AddSingleton(provider =>
+             {
+                 return new ProxyGenerator();
+             });
+            services.AddScoped<LogInterceptor>();
             return services;
         }
     }
