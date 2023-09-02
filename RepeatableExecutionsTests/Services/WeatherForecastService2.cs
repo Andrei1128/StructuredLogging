@@ -1,4 +1,4 @@
-﻿using RepeatableExecutionsTests.Attributes;
+﻿using Logging.Attributes;
 
 namespace RepeatableExecutionsTests.Services
 {

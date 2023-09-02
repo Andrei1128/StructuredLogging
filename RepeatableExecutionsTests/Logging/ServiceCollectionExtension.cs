@@ -1,51 +1,76 @@
-﻿using Castle.DynamicProxy;
+﻿//using Castle.DynamicProxy;
+//using Logging.Attributes;
+//using Logging.Helpers;
 
-namespace RepeatableExecutionsTests.Logging
+//namespace Logging.Logging
+//{
+//    public static class ServiceCollectionExtension
+//    {
+//        public static IServiceCollection AddStructuredLogging(this IServiceCollection services)
+//        {
+//            services.AddSingleton<ProxyGenerator>();
+//            services.AddScoped<ILog, Log>();
+//            services.AddScoped<LogInterceptor>();
+//            services.AddScoped<StructuredLoggingAttribute>();
+
+//            var assembliesToScan = AppDomain.CurrentDomain.GetAssemblies();
+
+//            foreach (var assembly in assembliesToScan)
+//            {
+//                var typesWithLogMethods = assembly.GetTypes()
+//                    .Where(type => type.GetMethods().Any(method => method.IsDefined(typeof(LogAttribute), true)));
+
+//                foreach (var type in typesWithLogMethods)
+//                {
+//                    var interceptor = services.BuildServiceProvider().GetRequiredService<LogInterceptor>();
+//                    var proxy = services.BuildServiceProvider().GetRequiredService<ProxyGenerator>().CreateClassProxy(type, interceptor);
+
+//                    services.AddScoped(type, serviceProvider => proxy);
+//                }
+//            }
+
+//            return services;
+//        }
+//    }
+//}
+using Castle.DynamicProxy;
+using Logging.Attributes;
+using Logging.Helpers;
+
+namespace Logging.Logging
 {
-    public static class ServiceCollectionExtensions
+    public static class ServiceCollectionExtension
     {
-        public static IServiceCollection AddLogging<TService, TImplementation>(this IServiceCollection services, ServiceLifetime lifetime)
-        where TService : class
-        where TImplementation : class, TService
+        public static IServiceCollection AddStructuredLogging(this IServiceCollection services)
         {
-            switch (lifetime)
-            {
-                case ServiceLifetime.Transient:
-                    services.AddTransient<TImplementation>();
-                    break;
-                case ServiceLifetime.Singleton:
-                    services.AddSingleton<TImplementation>();
-                    break;
-                case ServiceLifetime.Scoped:
-                default:
-                    services.AddScoped<TImplementation>();
-                    break;
-            }
-            services.Add(ServiceDescriptor.Describe(
-                typeof(TService),
-                provider =>
-                {
-                    var proxyGenerator = provider.GetRequiredService<ProxyGenerator>();
-                    var logInterceptor = provider.GetRequiredService<LogInterceptor>();
-                    var implementationInstance = provider.GetRequiredService<TImplementation>();
-
-                    var proxy = proxyGenerator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, logInterceptor);
-                    return proxy;
-                },
-                lifetime
-            ));
-
-            return services;
-        }
-        public static IServiceCollection InitializeLogging(this IServiceCollection services)
-        {
-            services.AddSingleton(provider =>
-             {
-                 return new ProxyGenerator();
-             });
+            services.AddSingleton<ProxyGenerator>();
+            services.AddScoped<ILog, Log>();
             services.AddScoped<LogInterceptor>();
+            services.AddScoped<StructuredLoggingAttribute>();
+
+            services.AddScoped(provider =>
+            {
+                var generator = provider.GetRequiredService<ProxyGenerator>();
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+                foreach (var assembly in assemblies)
+                {
+                    var typesWithLogMethods = assembly.GetTypes()
+                        .Where(type => type.GetMethods().Any(method => method.IsDefined(typeof(LogAttribute), true)));
+
+                    foreach (var type in typesWithLogMethods)
+                    {
+                        var interceptor = provider.GetRequiredService<LogInterceptor>();
+                        var proxy = generator.CreateClassProxy(type, interceptor);
+
+                        services.AddScoped(type, serviceProvider => proxy);
+                    }
+                }
+
+                return services;
+            });
+
             return services;
         }
     }
-
 }

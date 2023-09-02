@@ -50,6 +50,11 @@ namespace Logging.Logging
                 }
                 _logger.LogInteraction(interaction);
             }
+            //}
+            //else
+            //{
+            //    invocation.Proceed();
+            //}
         }
     }
 }

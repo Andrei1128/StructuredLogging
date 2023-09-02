@@ -1,5 +1,5 @@
+using Logging.Attributes;
 using Microsoft.AspNetCore.Mvc;
-using RepeatableExecutionsTests.Attributes;
 using RepeatableExecutionsTests.Services;
 
 namespace RepeatableExecutionsTests.Controllers
@@ -15,13 +15,13 @@ namespace RepeatableExecutionsTests.Controllers
             _weatherForecastService = weatherForecastService;
             _weatherForecastService2 = weatherForecastService2;
         }
-        [StructuredLogging]
+        [ServiceFilter(typeof(StructuredLoggingAttribute))]
         [HttpPost]
-        public string Get([FromBody] int payload)
+        public string GetWeatherEndpoint([FromBody] int payload)
         {
-            return _weatherForecastService.Get("asdasd", 12);
+            return _weatherForecastService.GetWeather("asdasd", 12);
         }
-        [StructuredLogging]
+        [ServiceFilter(typeof(StructuredLoggingAttribute))]
         [HttpPut]
         public string Get2([FromBody] int payload)
         {
