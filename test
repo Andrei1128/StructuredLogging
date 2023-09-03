@@ -1,37 +1,27 @@
 {
   "Entry": {
-    "Time": "2023-09-02T14:36:21.2787251+03:00",
-    "Operation": "Login",
+    "Time": "2023-09-03T17:10:54.7328719+03:00",
+    "Operation": "GetWeatherEndpoint",
     "Input": {
-      "model": {
-        "Email": "user@example.com",
-        "Password": "Andrei123"
-      }
+      "payload": 0
     },
     "Output": null
   },
-  "Interactions": [],
+  "Interactions": [
+    {
+      "Time": "2023-09-03T17:10:54.7360749+03:00",
+      "Operation": "GetWeather",
+      "Input": [
+        "asdasd",
+        12
+      ],
+      "Output": "asdasdasd"
+    }
+  ],
   "Exit": {
-    "Time": "2023-09-02T14:36:21.4341527+03:00",
+    "Time": "2023-09-03T17:10:54.7368546+03:00",
     "Operation": null,
     "Input": null,
-    "Output": {
-      "StatusCode": 200,
-      "IsSuccess": true,
-      "ErrorMessages": [],
-      "Result": {
-        "User": {
-          "Id": 3,
-          "Requests": [],
-          "Friends": [],
-          "Posts": [],
-          "Groups": [],
-          "Name": "string",
-          "ImageURL": null,
-          "BirthDate": "0001-01-01T00:00:00"
-        },
-        "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNeVVzZXJJZCI6IjMiLCJuYmYiOjE2OTM2NTQ1ODEsImV4cCI6MTY5MzkxMzc4MSwiaWF0IjoxNjkzNjU0NTgxfQ.80S8aiorJCgL42nUsRLW1nfaqb5Fv79Pqd610X1_cAs"
-      }
-    }
+    "Output": "asdasdasd"
   }
 }
