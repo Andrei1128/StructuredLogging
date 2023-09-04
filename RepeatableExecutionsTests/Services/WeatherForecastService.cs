@@ -9,9 +9,14 @@ namespace RepeatableExecutionsTests.Services
         {
             return "asdasdasd";
         }
+        public string GetWeather2(string data, int ora)
+        {
+            return "asdasdasd";
+        }
     }
     public interface IWeatherForecastService
     {
         public string GetWeather(string data, int ora);
+        public string GetWeather2(string data, int ora);
     }
 }

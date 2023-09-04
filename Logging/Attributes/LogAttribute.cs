@@ -1,6 +1,6 @@
 ﻿namespace Logging.Attributes
 {
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Method)]
     public class LogAttribute : Attribute
     {
     }

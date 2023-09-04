@@ -5,32 +5,58 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Logging.Logging
 {
-    public static class ServiceCollectionExtension
+    public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddStructuredLogging(this IServiceCollection services)
         {
             services.AddSingleton<ProxyGenerator>();
-            services.AddScoped<LogInterceptor>();
             services.AddScoped<ILog, Log>();
+            services.AddScoped<LogInterceptor>();
             services.AddScoped<StructuredLoggingAttribute>();
 
             var assembliesToScan = AppDomain.CurrentDomain.GetAssemblies();
 
             foreach (var assembly in assembliesToScan)
             {
-                var typesWithLogMethods = assembly.GetTypes()
-                    .Where(type => type.GetMethods().Any(method => method.IsDefined(typeof(LogAttribute), true)));
-
-                foreach (var type in typesWithLogMethods)
+                var types = assembly.GetTypes();
+                foreach (var type in types)
                 {
-                    var interceptor = services.BuildServiceProvider().GetRequiredService<LogInterceptor>();
-                    var proxy = services.BuildServiceProvider().GetRequiredService<ProxyGenerator>().CreateClassProxy(type, interceptor);
-
-                    services.AddScoped(type, serviceProvider => proxy);
+                    var interfaces = type.GetInterfaces();
+                    foreach (var @interface in interfaces)
+                    {
+                        if (@interface.IsInterface && @interface != typeof(IInterceptor))
+                        {
+                            if (HasMethodWithLogAttribute(type))
+                            {
+                                services.AddScoped(@interface, provider =>
+                                {
+                                    var proxyGenerator = provider.GetRequiredService<ProxyGenerator>();
+                                    var logInterceptor = provider.GetRequiredService<LogInterceptor>();
+                                    var implementationInstance = ActivatorUtilities.CreateInstance(provider, type);
+                                    var proxy = proxyGenerator.CreateInterfaceProxyWithTarget(@interface, implementationInstance, logInterceptor);
+                                    return proxy;
+                                });
+                            }
+                        }
+                    }
                 }
             }
 
             return services;
+        }
+        private static bool HasMethodWithLogAttribute(Type type)
+        {
+            var methods = type.GetMethods();
+            foreach (var method in methods)
+            {
+                var attributes = method.GetCustomAttributes(typeof(LogAttribute), true);
+
+                if (attributes.Length > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

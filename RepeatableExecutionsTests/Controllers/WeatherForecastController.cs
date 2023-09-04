@@ -25,7 +25,7 @@ namespace RepeatableExecutionsTests.Controllers
         [HttpPut]
         public string Get2([FromBody] int payload)
         {
-            return _weatherForecastService2.Get("asdasd", 12);
+            return _weatherForecastService.GetWeather2("asdasd", 12);
         }
     }
 }
