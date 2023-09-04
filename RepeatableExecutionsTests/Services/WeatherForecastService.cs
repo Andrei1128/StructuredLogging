@@ -1,21 +1,22 @@
-﻿using RepeatableExecutionsTests.Consts;
-using RepeatableExecutionsTests.Entities;
-using StructuredLogging.Attributes;
+﻿using Logging.Attributes;
 
 namespace RepeatableExecutionsTests.Services
 {
-    public class WeatherForecastService
+    public class WeatherForecastService : IWeatherForecastService
     {
         [Log]
-        public IEnumerable<WeatherForecast> Get()
+        public string GetWeather(string data, int ora)
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries.Data[Random.Shared.Next(Summaries.Data.Length)]
-            })
-            .ToArray();
+            return "asdasdasd";
         }
+        public string GetWeather2(string data, int ora)
+        {
+            return "asdasdasd";
+        }
+    }
+    public interface IWeatherForecastService
+    {
+        public string GetWeather(string data, int ora);
+        public string GetWeather2(string data, int ora);
     }
 }

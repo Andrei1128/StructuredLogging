@@ -1,0 +1,27 @@
+{
+  "Entry": {
+    "Time": "2023-09-03T17:10:54.7328719+03:00",
+    "Operation": "GetWeatherEndpoint",
+    "Input": {
+      "payload": 0
+    },
+    "Output": null
+  },
+  "Interactions": [
+    {
+      "Time": "2023-09-03T17:10:54.7360749+03:00",
+      "Operation": "GetWeather",
+      "Input": [
+        "asdasd",
+        12
+      ],
+      "Output": "asdasdasd"
+    }
+  ],
+  "Exit": {
+    "Time": "2023-09-03T17:10:54.7368546+03:00",
+    "Operation": null,
+    "Input": null,
+    "Output": "asdasdasd"
+  }
+}
