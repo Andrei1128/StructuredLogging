@@ -14,29 +14,25 @@ namespace Logging.Logging
             services.AddScoped<LogInterceptor>();
             services.AddScoped<StructuredLoggingAttribute>();
 
-            var assembliesToScan = AppDomain.CurrentDomain.GetAssemblies();
-
-            foreach (var assembly in assembliesToScan)
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
             {
                 var types = assembly.GetTypes();
                 foreach (var type in types)
                 {
-                    var interfaces = type.GetInterfaces();
-                    foreach (var @interface in interfaces)
+                    if (type.HasMethodWithLogAttribute())
                     {
-                        if (@interface.IsInterface && @interface != typeof(IInterceptor))
+                        var interfaces = type.GetInterfaces();
+                        foreach (var interf in interfaces)
                         {
-                            if (HasMethodWithLogAttribute(type))
+                            services.AddScoped(interf, provider =>
                             {
-                                services.AddScoped(@interface, provider =>
-                                {
-                                    var proxyGenerator = provider.GetRequiredService<ProxyGenerator>();
-                                    var logInterceptor = provider.GetRequiredService<LogInterceptor>();
-                                    var implementationInstance = ActivatorUtilities.CreateInstance(provider, type);
-                                    var proxy = proxyGenerator.CreateInterfaceProxyWithTarget(@interface, implementationInstance, logInterceptor);
-                                    return proxy;
-                                });
-                            }
+                                var proxyGenerator = provider.GetRequiredService<ProxyGenerator>();
+                                var logInterceptor = provider.GetRequiredService<LogInterceptor>();
+                                var implementationInstance = ActivatorUtilities.CreateInstance(provider, type);
+                                var proxy = proxyGenerator.CreateInterfaceProxyWithTarget(interf, implementationInstance, logInterceptor);
+                                return proxy;
+                            });
                         }
                     }
                 }
@@ -44,12 +40,12 @@ namespace Logging.Logging
 
             return services;
         }
-        private static bool HasMethodWithLogAttribute(Type type)
+        private static bool HasMethodWithLogAttribute(this Type type)
         {
             var methods = type.GetMethods();
             foreach (var method in methods)
             {
-                var attributes = method.GetCustomAttributes(typeof(LogAttribute), true);
+                var attributes = method.GetCustomAttributes(typeof(LogAttribute), false);
 
                 if (attributes.Length > 0)
                 {

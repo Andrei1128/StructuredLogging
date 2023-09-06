@@ -22,9 +22,10 @@ namespace Logging.Logging
             }
             else
             {
-                LogObject interaction = new LogObject();
                 // Before execution
+                LogObject interaction = new LogObject();
                 interaction.Time = DateTime.Now;
+                interaction.Class = invocation.TargetType.FullName;
                 interaction.Operation = method.Name;
                 interaction.Input = invocation.Arguments;
 

@@ -21,12 +21,14 @@ namespace Logging.Attributes
         }
         private void LogEntry(ActionExecutingContext context)
         {
-            LogObject entry = new LogObject();
-            string endpointFullName = context.ActionDescriptor.DisplayName;
-            string actionName = endpointFullName.Substring(endpointFullName.LastIndexOf('.') + 1).Split(" ")[0];
-            entry.Operation = actionName;
-            entry.Time = DateTime.Now;
-            entry.Input = context.ActionArguments;
+            var displayName = context.ActionDescriptor.DisplayName;
+            LogObject entry = new LogObject()
+            {
+                Time = DateTime.Now,
+                Class = displayName.Substring(0, displayName.LastIndexOf('.')),
+                Operation = displayName.Substring(displayName.LastIndexOf('.') + 1).Split(" ")[0],
+                Input = context.ActionArguments
+            };
             _logger.LogEntry(entry);
         }
         private void LogExit(ActionExecutedContext resultContext)
