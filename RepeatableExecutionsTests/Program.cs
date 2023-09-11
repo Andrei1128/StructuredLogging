@@ -1,5 +1,5 @@
-using Logging.Logging;
-using RepeatableExecutionsTests.Services;
+using Logging;
+using RepeatableExecutionsTests;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,10 +7,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.Services.AddScoped<IWeatherForecastService, WeatherForecastService>();
-builder.Services.AddScoped<IWeatherForecastService2, WeatherForecastService2>();
-
-builder.Services.AddStructuredLogging();
+builder.Services.InitializeLogging();
+builder.Services.AddLogging<ITestService, TestService>(ServiceLifetime.Scoped);
+builder.Services.AddLogging<ITestRepository, TestRepository>(ServiceLifetime.Scoped);
 
 var app = builder.Build();
 

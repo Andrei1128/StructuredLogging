@@ -1,4 +1,4 @@
-﻿namespace Logging.Helpers
+﻿namespace Logging
 {
     public class LogObject
     {
