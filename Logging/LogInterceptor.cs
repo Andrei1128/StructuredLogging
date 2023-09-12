@@ -11,32 +11,24 @@ namespace Logging
         }
         public void Intercept(IInvocation invocation)
         {
-            //CREATE A BUILDER FOR LOG
-            LogObject log;
-            try
-            {
-                log = CreateInteraction(invocation);
-                invocation.Proceed();
-                log.Output = invocation.ReturnValue;
-            }
-            catch (Exception ex)
-            {
-                log.Output = ex.ToString();
-            }
-            finally
-            {
-                _logger.AddInteraction(interaction);
-            }
-        }
-        private LogObject CreateInteraction(IInvocation invocation)
-        {
-            return new LogObject()
+            LogObject interaction = new LogObject()
             {
                 Time = DateTime.Now,
                 Class = invocation.TargetType.FullName,
                 Operation = invocation.Method.Name,
                 Input = invocation.Arguments,
             };
+            invocation.Proceed();
+            try
+            {
+                invocation.Proceed();
+                interaction.Output = invocation.ReturnValue;
+            }
+            catch (Exception ex)
+            {
+                interaction.Output = ex;
+            }
+            _logger.LogInteraction(interaction);
         }
     }
 }
