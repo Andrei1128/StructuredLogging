@@ -15,10 +15,9 @@ namespace Logging
             {
                 Time = DateTime.Now,
                 Class = invocation.TargetType.FullName,
-                Operation = invocation.Method.Name,
+                Method = invocation.Method.Name,
                 Input = invocation.Arguments,
             };
-            invocation.Proceed();
             try
             {
                 invocation.Proceed();
@@ -26,9 +25,14 @@ namespace Logging
             }
             catch (Exception ex)
             {
+                interaction.HasError = true;
                 interaction.Output = ex;
             }
-            _logger.LogInteraction(interaction);
+            Log log = new Log()
+            {
+                Entry = interaction
+            };
+            _logger.LogInteraction(log);
         }
     }
 }

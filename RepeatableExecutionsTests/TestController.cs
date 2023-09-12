@@ -1,3 +1,4 @@
+using Logging;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RepeatableExecutionsTests
@@ -12,6 +13,7 @@ namespace RepeatableExecutionsTests
             _testService = testService;
         }
         [HttpPost]
+        [ServiceFilter(typeof(StructuredLoggingAttribute))]
         public string GetWeatherEndpoint([FromBody] string payload)
         {
             return _testService.Test("Ok_Service");

@@ -4,36 +4,30 @@ namespace Logging
 {
     public class Log : ILog
     {
-        public LogObject Entry { get; private set; }
-        public IList<LogObject> Interactions { get; private set; } = new List<LogObject>();
-        public LogObject Exit { get; private set; }
+        public LogObject Entry { get; set; }
+        public IList<Log> Interactions { get; private set; } = new List<Log>();
         public void LogEntry(LogObject entry)
         {
             Entry = entry;
         }
-        public void LogInteraction(LogObject interaction)
+        public void LogInteraction(Log interaction)
         {
             Interactions.Add(interaction);
         }
-        public void LogExit(LogObject exit)
-        {
-            Exit = exit;
-        }
         public void WriteToFile()
         {
-            string folderPath = "../logs";
+            string folderPath = "../Logging/logs";
             string serializedLog = JsonSerializer.Serialize(this);
             var guid = Guid.NewGuid().ToString();
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
-            File.WriteAllText($"{folderPath}/{guid}.txt", serializedLog);
+            File.WriteAllText($"{folderPath}/{guid}.json", serializedLog);
         }
     }
     public interface ILog
     {
         public void LogEntry(LogObject entry);
-        public void LogInteraction(LogObject interaction);
-        public void LogExit(LogObject exit);
+        public void LogInteraction(Log interaction);
         public void WriteToFile();
     }
 }

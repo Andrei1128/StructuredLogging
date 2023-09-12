@@ -1,20 +1,19 @@
 ﻿namespace RepeatableExecutionsTests
 {
-    public class TestService : ITestService
+    public class TestRepository : ITestRepository
     {
-        private readonly ITestRepository _repository;
-        public TestService(ITestRepository repository)
+        private readonly ITestAboveRepository _aboveRepository;
+        public TestRepository(ITestAboveRepository aboveRepository)
         {
-            _repository = repository;
+            _aboveRepository = aboveRepository;
         }
         public string Test(string data)
         {
-            var result = _repository.Test(data + "_Repository");
-            throw new Exception("Ok_Exception");
+            var result = _aboveRepository.Test(data + "_AboveRepository");
             return result;
         }
     }
-    public interface ITestService
+    public interface ITestRepository
     {
         public string Test(string data);
     }

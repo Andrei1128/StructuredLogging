@@ -42,6 +42,7 @@ namespace Logging
             services.AddSingleton<ProxyGenerator>();
             services.AddScoped<ILog, Log>();
             services.AddScoped<LogInterceptor>();
+            services.AddScoped<StructuredLoggingAttribute>();
             return services;
         }
     }

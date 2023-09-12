@@ -12,44 +12,43 @@ namespace Logging
         }
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            LogEntry(context);
-            var resultContext = await next();
-            LogExit(resultContext);
+            Log(context, await next());
             _logger.WriteToFile();
         }
-        private void LogEntry(ActionExecutingContext context)
+        private void Log(ActionExecutingContext context, ActionExecutedContext result)
         {
-            var displayName = context.ActionDescriptor.DisplayName;
+            var names = GetNames(context);
             LogObject entry = new LogObject()
             {
                 Time = DateTime.Now,
-                Class = displayName.Substring(0, displayName.LastIndexOf('.')),
-                Operation = displayName.Substring(displayName.LastIndexOf('.') + 1).Split(" ")[0],
+                Class = names.className,
+                Method = names.methodName,
                 Input = context.ActionArguments
             };
-            _logger.LogEntry(entry);
-        }
-        private void LogExit(ActionExecutedContext resultContext)
-        {
-            LogObject exit = new LogObject();
-            exit.Time = DateTime.Now;
-            if (resultContext.Exception == null)
+            if (result.Exception == null)
             {
-                if (resultContext.Result is ObjectResult objectResult)
+                if (result.Result is ObjectResult objectResult)
                 {
-                    exit.Output = objectResult.Value;
+                    entry.Output = objectResult.Value;
                 }
                 else
                 {
-                    var resultType = resultContext.Result?.GetType();
-                    exit.Output = $"Case for \"{resultType}\" was not implemented!";
+                    var resultType = result.Result?.GetType();
+                    entry.Output = $"Case for \"{resultType}\" was not implemented!";
                 }
             }
             else
             {
-                exit.Output = resultContext.Exception;
+                entry.HasError = true;
+                entry.Output = result.Exception;
             }
-            _logger.LogExit(exit);
+            _logger.LogEntry(entry);
+        }
+        private (string className, string methodName) GetNames(ActionExecutingContext context)
+        {
+            string displayName = context.ActionDescriptor.DisplayName;
+            return (displayName.Substring(0, displayName.LastIndexOf('.')),
+                    displayName.Substring(displayName.LastIndexOf('.') + 1).Split(" ")[0]);
         }
     }
 }

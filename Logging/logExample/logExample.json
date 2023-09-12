@@ -1,0 +1,58 @@
+{
+  "Entry": {
+    "Time": "2023-09-12T18:51:51.0365696+03:00",
+    "Class": "RepeatableExecutionsTests.TestController",
+    "Method": "GetWeatherEndpoint",
+    "Input": { "payload": "string" },
+    "Output": "Ok_Service_Repository_AboveRepository_Ok_Service_Repository2",
+    "HasError": false
+  },
+  "Interactions": [
+    {
+      "Entry": {
+        "Time": "2023-09-12T18:51:51.0343575+03:00",
+        "Class": "RepeatableExecutionsTests.TestService",
+        "Method": "Test",
+        "Input": [ "Ok_Service" ],
+        "Output": "Ok_Service_Repository_AboveRepository_Ok_Service_Repository2",
+        "HasError": false
+      },
+      "Interactions": [
+        {
+          "Entry": {
+            "Time": "2023-09-12T18:51:51.0350861+03:00",
+            "Class": "RepeatableExecutionsTests.TestRepository",
+            "Method": "Test",
+            "Input": [ "Ok_Service_Repository" ],
+            "Output": "Ok_Service_Repository_AboveRepository",
+            "HasError": false
+          },
+          "Interactions": [
+            {
+              "Entry": {
+                "Time": "2023-09-12T18:51:51.0353582+03:00",
+                "Class": "RepeatableExecutionsTests.TestAboveRepository",
+                "Method": "Test",
+                "Input": [ "Ok_Service_Repository_AboveRepository" ],
+                "Output": "Ok_Service_Repository_AboveRepository",
+                "HasError": false
+              },
+              "Interactions": []
+            }
+          ]
+        },
+        {
+          "Entry": {
+            "Time": "2023-09-12T18:51:51.0358719+03:00",
+            "Class": "RepeatableExecutionsTests.TestRepository2",
+            "Method": "Test",
+            "Input": [ "Ok_Service_Repository2" ],
+            "Output": "Ok_Service_Repository2",
+            "HasError": false
+          },
+          "Interactions": []
+        }
+      ]
+    }
+  ]
+}
