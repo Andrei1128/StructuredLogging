@@ -1,6 +1,7 @@
 ﻿using Castle.DynamicProxy;
+using Logging.Objects;
 
-namespace Logging
+namespace Logging.Interceptors
 {
     public class LogInterceptor : IInterceptor
     {
@@ -11,28 +12,32 @@ namespace Logging
         }
         public void Intercept(IInvocation invocation)
         {
-            LogObject interaction = new LogObject()
+            LogEntry entry = new LogEntry()
             {
                 Time = DateTime.Now,
                 Class = invocation.TargetType.FullName,
                 Method = invocation.Method.Name,
                 Input = invocation.Arguments,
             };
+            Log interaction = new Log(entry);
+            _logger.LogInteraction(interaction);
+            LogExit exit = new LogExit();
             try
             {
                 invocation.Proceed();
-                interaction.Output = invocation.ReturnValue;
+                exit.Time = DateTime.Now;
+                exit.Output = invocation.ReturnValue;
             }
             catch (Exception ex)
             {
-                interaction.HasError = true;
-                interaction.Output = ex;
+                exit.Time = DateTime.Now;
+                exit.HasError = true;
+                exit.Output = ex;
             }
-            Log log = new Log()
+            finally
             {
-                Entry = interaction
-            };
-            _logger.LogInteraction(log);
+                _logger.LogExit(exit);
+            }
         }
     }
 }

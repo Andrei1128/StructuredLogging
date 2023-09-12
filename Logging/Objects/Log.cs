@@ -1,18 +1,25 @@
 ﻿using System.Text.Json;
 
-namespace Logging
+namespace Logging.Objects
 {
     public class Log : ILog
     {
-        public LogObject Entry { get; set; }
+        public LogEntry Entry { get; set; }
         public IList<Log> Interactions { get; private set; } = new List<Log>();
-        public void LogEntry(LogObject entry)
+        public LogExit Exit { get; private set; }
+        public Log(LogEntry entry) { Entry = entry; }
+        public void LogEntry(LogEntry entry)
         {
             Entry = entry;
+        }
+        public void LogExit(LogExit exit)
+        {
+            Exit = exit;
         }
         public void LogInteraction(Log interaction)
         {
             Interactions.Add(interaction);
+            //this = interaction;
         }
         public void WriteToFile()
         {
@@ -26,8 +33,9 @@ namespace Logging
     }
     public interface ILog
     {
-        public void LogEntry(LogObject entry);
+        public void LogEntry(LogEntry entry);
         public void LogInteraction(Log interaction);
+        public void LogExit(LogExit exit);
         public void WriteToFile();
     }
 }

@@ -1,4 +1,4 @@
-using Logging;
+using Logging.ServiceExtensions;
 using RepeatableExecutionsTests;
 
 var builder = WebApplication.CreateBuilder(args);

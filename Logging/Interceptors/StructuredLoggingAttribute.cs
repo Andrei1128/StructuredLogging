@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Logging.Objects;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Logging
@@ -12,37 +13,47 @@ namespace Logging
         }
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            Log(context, await next());
+            LogEntry(context);
+            var result = await next();
+            LogExit(result);
             _logger.WriteToFile();
         }
-        private void Log(ActionExecutingContext context, ActionExecutedContext result)
+        private void LogEntry(ActionExecutingContext context)
         {
             var names = GetNames(context);
-            LogObject entry = new LogObject()
+            LogEntry entry = new LogEntry()
             {
                 Time = DateTime.Now,
                 Class = names.className,
                 Method = names.methodName,
                 Input = context.ActionArguments
             };
+            _logger.LogEntry(entry);
+        }
+        private void LogExit(ActionExecutedContext result)
+        {
+            LogExit exit = new LogExit()
+            {
+                Time = DateTime.Now
+            };
             if (result.Exception == null)
             {
                 if (result.Result is ObjectResult objectResult)
                 {
-                    entry.Output = objectResult.Value;
+                    exit.Output = objectResult.Value;
                 }
                 else
                 {
                     var resultType = result.Result?.GetType();
-                    entry.Output = $"Case for \"{resultType}\" was not implemented!";
+                    exit.Output = $"Case for \"{resultType}\" was not implemented!";
                 }
             }
             else
             {
-                entry.HasError = true;
-                entry.Output = result.Exception;
+                exit.HasError = true;
+                exit.Output = result.Exception;
             }
-            _logger.LogEntry(entry);
+            _logger.LogExit(exit);
         }
         private (string className, string methodName) GetNames(ActionExecutingContext context)
         {
