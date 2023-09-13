@@ -1,0 +1,23 @@
+{
+  "MethodName": "Main",
+  "ChildCalls": [
+    {
+      "MethodName": "Test",
+      "ChildCalls": [
+        {
+          "MethodName": "Test",
+          "ChildCalls": [
+            {
+              "MethodName": "Test",
+              "ChildCalls": []
+            }
+          ]
+        },
+        {
+          "MethodName": "Test",
+          "ChildCalls": []
+        }
+      ]
+    }
+  ]
+}
