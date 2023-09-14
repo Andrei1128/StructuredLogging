@@ -12,7 +12,7 @@ namespace RepeatableExecutionsTests
             _testService = testService;
         }
         [HttpPost]
-        [StructuredLogging]
+        [ServiceFilter(typeof(StructuredLoggingAttribute))]
         public string GetWeatherEndpoint([FromBody] string payload)
         {
             return _testService.Test("Ok_Service");

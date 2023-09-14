@@ -7,7 +7,11 @@ namespace Logging.Interceptors
 {
     public class StructuredLoggingAttribute : Attribute, IAsyncActionFilter
     {
-        private Log Root = new Log();
+        private readonly ILog _root;
+        public StructuredLoggingAttribute(ILog root)
+        {
+            _root = root;
+        }
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             LogControllerEntry(context);
@@ -18,13 +22,14 @@ namespace Logging.Interceptors
         private void LogControllerEntry(ActionExecutingContext context)
         {
             (string className, string methodName) names = GetNames(context);
-            Root.Entry = new LogEntry()
-            {
-                Time = DateTime.Now,
-                Class = names.className,
-                Method = names.methodName,
-                Input = context.ActionArguments
-            };
+            _root.LogEntry(
+                new LogEntry()
+                {
+                    Time = DateTime.Now,
+                    Class = names.className,
+                    Method = names.methodName,
+                    Input = context.ActionArguments
+                });
         }
         private (string className, string methodName) GetNames(ActionExecutingContext context)
         {
@@ -35,24 +40,26 @@ namespace Logging.Interceptors
         private void LogControllerExit(ActionExecutedContext executedAction)
         {
             if (executedAction.Exception == null)
-                Root.Exit = new LogExit()
-                {
-                    Time = DateTime.Now,
-                    Output = GetResult(executedAction),
-                    HasError = false
-                };
+                _root.LogExit(
+                    new LogExit()
+                    {
+                        Time = DateTime.Now,
+                        Output = GetResult(executedAction),
+                        HasError = false
+                    });
             else
-                Root.Exit = new LogExit()
-                {
-                    Time = DateTime.Now,
-                    Output = executedAction.Exception,
-                    HasError = true
-                };
+                _root.LogExit(
+                    new LogExit()
+                    {
+                        Time = DateTime.Now,
+                        Output = executedAction.Exception,
+                        HasError = true
+                    });
         }
         private void WriteToFile()
         {
             string folderPath = "../Logging/logs";
-            string serializedLog = JsonSerializer.Serialize(Root);
+            string serializedLog = JsonSerializer.Serialize(_root.GetLog());
             var guid = Guid.NewGuid().ToString();
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);

@@ -5,9 +5,13 @@ namespace Logging.Interceptors
 {
     public class LogInterceptor : IInterceptor
     {
-        private Log Root = new Log(); //Get this somehow from StructuredLoggingAttribute
+        private readonly ILog _root;
         private Stack<Log> CallStack = new Stack<Log>();
-        private bool IsNotRoot = false;
+        private bool IsNotCallStackRoot = false;
+        public LogInterceptor(ILog root)
+        {
+            _root = root;
+        }
         public void Intercept(IInvocation invocation)
         {
             Log current = new Log()
@@ -20,15 +24,15 @@ namespace Logging.Interceptors
                     Input = invocation.Arguments,
                 }
             };
-            if (IsNotRoot)
+            if (IsNotCallStackRoot)
             {
                 Log parent = CallStack.Peek();
                 parent.Interactions.Add(current);
             }
             else
             {
-                Root.Interactions.Add(current);
-                IsNotRoot = true;
+                _root.LogInteraction(current);
+                IsNotCallStackRoot = true;
             }
             CallStack.Push(current);
             try
@@ -46,7 +50,7 @@ namespace Logging.Interceptors
                 current.Exit = new LogExit()
                 {
                     Time = DateTime.Now,
-                    Output = ex,
+                    Output = ex.ToString,
                     HasError = true
                 };
             }
