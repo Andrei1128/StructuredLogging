@@ -1,14 +1,15 @@
-﻿namespace Logging.Interceptors
+﻿using Castle.DynamicProxy;
+using Logging.Objects;
+using System.Text.Json;
+
+namespace Logging.Interceptors
 {
-    using Castle.DynamicProxy;
-    using Logging.Objects;
-    using Newtonsoft.Json;
-    using System.Collections.Generic;
 
     public class LogInterceptor : IInterceptor
     {
-        private Log rootMethod = new Log { MethodName = "Main" };
-        private Stack<Log> callStack = new Stack<Log>();
+        private Log Root = new Log();
+        private Stack<Log> CallStack = new Stack<Log>();
+        private bool IsNotRoot = false;
 
         public void Intercept(IInvocation invocation)
         {
@@ -16,41 +17,67 @@
             Console.WriteLine(methodName);
 
             // Create a new method call node
-            Log currentMethod = new Log { MethodName = methodName };
-
-            // Add it to the parent's child calls (if not root)
-            if (callStack.Count > 0)
+            Log current = new Log()
             {
-                Log parentMethod = callStack.Peek();
-                parentMethod.ChildCalls.Add(currentMethod);
+                Entry = new LogEntry()
+                {
+                    Time = DateTime.Now,
+                    Class = invocation.TargetType.FullName,
+                    Method = invocation.Method.Name,
+                    Input = invocation.Arguments,
+                }
+            };
+
+            // Add it to the parent's child calls (if not Root)
+            if (IsNotRoot)
+            {
+                Log parent = CallStack.Peek();
+                parent.Interactions.Add(current);
             }
             else
             {
-                rootMethod.ChildCalls.Add(currentMethod);
+                Root.Interactions.Add(current);
+                IsNotRoot = true;
             }
 
             // Push the current method onto the call stack
-            callStack.Push(currentMethod);
-            SerializeAndSave();
+            CallStack.Push(current);
             try
             {
                 // Proceed with the original method call
                 invocation.Proceed();
+                current.Exit = new LogExit()
+                {
+                    Time = DateTime.Now,
+                    Output = invocation.ReturnValue
+                };
+            }
+            catch (Exception ex)
+            {
+                current.Exit = new LogExit()
+                {
+                    Time = DateTime.Now,
+                    HasError = true,
+                    Output = ex
+                };
+
             }
             finally
             {
                 // Pop the current method from the call stack
-                callStack.Pop();
+                CallStack.Pop();
+                if (CallStack.Count == 0 && IsNotRoot)
+                    WriteToFile();
             }
-            SerializeAndSave();
         }
-        public void SerializeAndSave()
+        public void WriteToFile()
         {
-            string json = JsonConvert.SerializeObject(rootMethod, Formatting.Indented);
-            Console.WriteLine(json);
-            File.WriteAllText("method_calls.json", json);
-            Console.WriteLine("Method call tree has been serialized to method_calls.json.");
+            string folderPath = "../Logging/logs";
+            string serializedLog = JsonSerializer.Serialize(Root);
+            var guid = Guid.NewGuid().ToString();
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+            File.WriteAllText($"{folderPath}/{guid}.json", serializedLog);
         }
     }
-
 }

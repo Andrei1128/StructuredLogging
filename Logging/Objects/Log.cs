@@ -2,7 +2,8 @@
 {
     public class Log
     {
-        public string MethodName { get; set; }
-        public List<Log> ChildCalls { get; set; } = new List<Log>();
+        public LogEntry Entry { get; set; }
+        public LogExit Exit { get; set; }
+        public List<Log> Interactions { get; set; } = new List<Log>();
     }
 }
