@@ -50,7 +50,7 @@ namespace Logging.Interceptors
                 current.Exit = new LogExit()
                 {
                     Time = DateTime.Now,
-                    Output = ex.ToString,
+                    Output = ex,
                     HasError = true
                 };
             }
