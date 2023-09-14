@@ -1,5 +1,5 @@
+using Logging.Interceptors;
 using Microsoft.AspNetCore.Mvc;
-
 namespace RepeatableExecutionsTests
 {
     [ApiController]
@@ -12,7 +12,7 @@ namespace RepeatableExecutionsTests
             _testService = testService;
         }
         [HttpPost]
-        //[ServiceFilter(typeof(StructuredLoggingAttribute))]
+        [StructuredLogging]
         public string GetWeatherEndpoint([FromBody] string payload)
         {
             return _testService.Test("Ok_Service");

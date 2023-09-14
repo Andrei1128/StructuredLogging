@@ -12,15 +12,14 @@ namespace Logging.ServiceExtensions
         {
             switch (lifetime)
             {
+                case ServiceLifetime.Scoped:
+                    services.AddScoped<TImplementation>();
+                    break;
                 case ServiceLifetime.Transient:
                     services.AddTransient<TImplementation>();
                     break;
                 case ServiceLifetime.Singleton:
                     services.AddSingleton<TImplementation>();
-                    break;
-                case ServiceLifetime.Scoped:
-                default:
-                    services.AddScoped<TImplementation>();
                     break;
             }
             services.Add(ServiceDescriptor.Describe(
@@ -35,16 +34,14 @@ namespace Logging.ServiceExtensions
                 },
                 lifetime
             ));
-
             return services;
         }
         public static IServiceCollection InitializeLogging(this IServiceCollection services)
         {
             services.AddSingleton<ProxyGenerator>();
             services.AddScoped<LogInterceptor>();
-            //services.AddScoped<StructuredLoggingAttribute>();
+            services.AddScoped<StructuredLoggingAttribute>();
             return services;
         }
     }
-
 }

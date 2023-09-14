@@ -1,22 +1,15 @@
 ﻿using Castle.DynamicProxy;
 using Logging.Objects;
-using System.Text.Json;
 
 namespace Logging.Interceptors
 {
-
     public class LogInterceptor : IInterceptor
     {
-        private Log Root = new Log();
+        private Log Root = new Log(); //Get this somehow from StructuredLoggingAttribute
         private Stack<Log> CallStack = new Stack<Log>();
         private bool IsNotRoot = false;
-
         public void Intercept(IInvocation invocation)
         {
-            string methodName = invocation.Method.Name;
-            Console.WriteLine(methodName);
-
-            // Create a new method call node
             Log current = new Log()
             {
                 Entry = new LogEntry()
@@ -27,8 +20,6 @@ namespace Logging.Interceptors
                     Input = invocation.Arguments,
                 }
             };
-
-            // Add it to the parent's child calls (if not Root)
             if (IsNotRoot)
             {
                 Log parent = CallStack.Peek();
@@ -39,17 +30,15 @@ namespace Logging.Interceptors
                 Root.Interactions.Add(current);
                 IsNotRoot = true;
             }
-
-            // Push the current method onto the call stack
             CallStack.Push(current);
             try
             {
-                // Proceed with the original method call
                 invocation.Proceed();
                 current.Exit = new LogExit()
                 {
                     Time = DateTime.Now,
-                    Output = invocation.ReturnValue
+                    Output = invocation.ReturnValue,
+                    HasError = false
                 };
             }
             catch (Exception ex)
@@ -57,27 +46,14 @@ namespace Logging.Interceptors
                 current.Exit = new LogExit()
                 {
                     Time = DateTime.Now,
-                    HasError = true,
-                    Output = ex
+                    Output = ex,
+                    HasError = true
                 };
-
             }
             finally
             {
-                // Pop the current method from the call stack
                 CallStack.Pop();
-                if (CallStack.Count == 0 && IsNotRoot)
-                    WriteToFile();
             }
-        }
-        public void WriteToFile()
-        {
-            string folderPath = "../Logging/logs";
-            string serializedLog = JsonSerializer.Serialize(Root);
-            var guid = Guid.NewGuid().ToString();
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-            File.WriteAllText($"{folderPath}/{guid}.json", serializedLog);
         }
     }
 }
