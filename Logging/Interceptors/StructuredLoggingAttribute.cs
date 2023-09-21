@@ -1,92 +1,70 @@
-﻿using Logging.Objects;
+﻿using Logging.Manager;
+using Logging.Objects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Text.Json;
 
 namespace Logging.Interceptors
 {
+    [AttributeUsage(AttributeTargets.Method)]
     public class StructuredLoggingAttribute : Attribute, IAsyncActionFilter
     {
         private readonly ILog _root;
-        public StructuredLoggingAttribute(ILog root)
-        {
-            _root = root;
-        }
+        public StructuredLoggingAttribute(ILog root) => _root = root;
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            LogManager.StartLogging();
             LogControllerEntry(context);
             var executedAction = await next();
             LogControllerExit(executedAction);
-            WriteToFile();
+            if (executedAction.Exception != null)
+            {
+                _root.WriteToFile();
+                throw executedAction.Exception;
+            }
+            //if(!LogOnlyOnError)
+            _root.WriteToFile();
         }
         private void LogControllerEntry(ActionExecutingContext context)
         {
             (string className, string methodName) names = GetNames(context);
             _root.LogEntry(
-                new LogEntry()
-                {
-                    Time = DateTime.Now,
-                    Class = names.className,
-                    Method = names.methodName,
-                    Input = context.ActionArguments
-                });
-        }
-        private (string className, string methodName) GetNames(ActionExecutingContext context)
-        {
-            string displayName = context.ActionDescriptor.DisplayName;
-            return (displayName.Substring(0, displayName.LastIndexOf('.')),
-                    displayName.Substring(displayName.LastIndexOf('.') + 1).Split(" ")[0]);
+                new LogEntry(DateTime.Now,
+                             names.className,
+                             names.methodName,
+                             context.ActionArguments));
         }
         private void LogControllerExit(ActionExecutedContext executedAction)
         {
             if (executedAction.Exception == null)
-                _root.LogExit(
-                    new LogExit()
-                    {
-                        Time = DateTime.Now,
-                        Output = GetResult(executedAction),
-                        HasError = false
-                    });
-            else
-                _root.LogExit(
-                    new LogExit()
-                    {
-                        Time = DateTime.Now,
-                        Output = executedAction.Exception,
-                        HasError = true
-                    });
-        }
-        private void WriteToFile()
-        {
-            string folderPath = "../Logging/logs";
-            string serializedLog = JsonSerializer.Serialize(_root.GetLog());
-            var guid = Guid.NewGuid().ToString();
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-            File.WriteAllText($"{folderPath}/{guid}.json", serializedLog);
-        }
-        private object GetResult(ActionExecutedContext executedAction)
-        {
-            switch (executedAction.Result)
             {
-                case ObjectResult objectResult:
-                    return objectResult.Value;
-                case JsonResult jsonResult:
-                    return jsonResult.Value;
-                case ContentResult contentResult:
-                    return contentResult.Content;
-                case StatusCodeResult statusCodeResult:
-                    return $"Status Code: {statusCodeResult.StatusCode}";
-                case RedirectResult redirectResult:
-                    return $"Redirect to: {redirectResult.Url}";
-                case RedirectToActionResult redirectToActionResult:
-                    return $"Redirect to Action: {redirectToActionResult.ActionName}";
-                case RedirectToRouteResult redirectToRouteResult:
-                    return $"Redirect to Route: {redirectToRouteResult.RouteName}";
-                default:
-                    var executedActionType = executedAction.Result?.GetType();
-                    return $"Case for `{executedActionType}` result type was not implemented!";
+                _root.LogExit(
+                    new LogExit(DateTime.Now, GetResult(executedAction)));
             }
+            else
+            {
+                _root.LogExit(
+                    new LogExit(DateTime.Now, executedAction.Exception));
+            }
+        }
+        private static object GetResult(ActionExecutedContext executedAction)
+        {
+            return executedAction.Result switch
+            {
+                ObjectResult objectResult => objectResult.Value,
+                JsonResult jsonResult => jsonResult.Value,
+                ContentResult contentResult => contentResult.Content,
+                StatusCodeResult statusCodeResult => $"Status Code: {statusCodeResult.StatusCode}",
+                RedirectResult redirectResult => $"Redirect to: {redirectResult.Url}",
+                RedirectToActionResult redirectToActionResult => $"Redirect to Action: {redirectToActionResult.ActionName}",
+                RedirectToRouteResult redirectToRouteResult => $"Redirect to Route: {redirectToRouteResult.RouteName}",
+                _ => $"Case for `{executedAction.Result.GetType()}` result type was not implemented!"
+            };
+        }
+        private static (string className, string methodName) GetNames(ActionExecutingContext context)
+        {
+            string displayName = context.ActionDescriptor.DisplayName;
+            return (displayName.Substring(0, displayName.LastIndexOf('.')),
+                    displayName.Substring(displayName.LastIndexOf('.') + 1).Split(" ")[0]);
         }
     }
 }

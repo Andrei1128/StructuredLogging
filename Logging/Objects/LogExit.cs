@@ -2,8 +2,12 @@
 {
     public class LogExit
     {
-        public DateTime Time { get; set; }
-        public object Output { get; set; }
-        public bool HasError { get; set; }
+        public DateTime Time { get; }
+        public object Output { get; }
+        public LogExit(DateTime time, object output)
+        {
+            Time = time;
+            Output = output;
+        }
     }
 }

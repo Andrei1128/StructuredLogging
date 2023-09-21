@@ -1,4 +1,5 @@
 ﻿using Castle.DynamicProxy;
+using Logging.Manager;
 using Logging.Objects;
 
 namespace Logging.Interceptors
@@ -6,25 +7,26 @@ namespace Logging.Interceptors
     public class LogInterceptor : IInterceptor
     {
         private readonly ILog _root;
-        private Stack<Log> CallStack = new Stack<Log>();
-        private bool IsNotCallStackRoot = false;
-        public LogInterceptor(ILog root)
-        {
-            _root = root;
-        }
+        private readonly Stack<Log> CallStack = new();
+        private bool IsCallStackRoot = true;
+        public LogInterceptor(ILog root) => _root = root;
         public void Intercept(IInvocation invocation)
         {
-            Log current = new Log()
+            if (!LogManager.IsLogging())
             {
-                Entry = new LogEntry()
-                {
-                    Time = DateTime.Now,
-                    Class = invocation.TargetType.FullName,
-                    Method = invocation.Method.Name,
-                    Input = invocation.Arguments,
-                }
+                invocation.Proceed();
+                return;
+            }
+
+            Log current = new()
+            {
+                Entry = new LogEntry(
+                    DateTime.Now,
+                    invocation.TargetType.FullName,
+                    invocation.Method.Name,
+                    invocation.Arguments)
             };
-            if (IsNotCallStackRoot)
+            if (!IsCallStackRoot)
             {
                 Log parent = CallStack.Peek();
                 parent.Interactions.Add(current);
@@ -32,27 +34,19 @@ namespace Logging.Interceptors
             else
             {
                 _root.LogInteraction(current);
-                IsNotCallStackRoot = true;
+                IsCallStackRoot = false;
             }
             CallStack.Push(current);
             try
             {
                 invocation.Proceed();
-                current.Exit = new LogExit()
-                {
-                    Time = DateTime.Now,
-                    Output = invocation.ReturnValue,
-                    HasError = false
-                };
+                current.Exit = new LogExit(DateTime.Now, invocation.ReturnValue);
             }
             catch (Exception ex)
             {
-                current.Exit = new LogExit()
-                {
-                    Time = DateTime.Now,
-                    Output = ex,
-                    HasError = true
-                };
+                current.Exit = new LogExit(DateTime.Now, ex);
+                _root.WriteToFile();
+                throw;
             }
             finally
             {
