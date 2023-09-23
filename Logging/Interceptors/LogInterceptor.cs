@@ -46,7 +46,7 @@ namespace Logging.Interceptors
             catch (Exception ex)
             {
                 current.Exit = new LogExit(DateTime.Now, ex);
-                if (!LoggerConfiguration.IsSupressingExcetions)
+                if (!LoggerConfiguration.IsSupressingExceptions)
                 {
                     _root.WriteToFile();
                     throw;

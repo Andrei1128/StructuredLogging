@@ -20,7 +20,7 @@ namespace Logging.Interceptors
             if (executedAction.Exception != null)
             {
                 _root.WriteToFile();
-                if (!LoggerConfiguration.IsSupressingExcetions)
+                if (!LoggerConfiguration.IsSupressingExceptions)
                     throw executedAction.Exception;
             }
             else if (!LoggerConfiguration.IsLoggingOnlyOnExceptions)
