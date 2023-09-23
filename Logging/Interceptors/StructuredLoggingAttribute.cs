@@ -1,4 +1,5 @@
-﻿using Logging.Manager;
+﻿using Logging.Configurations;
+using Logging.Manager;
 using Logging.Objects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -19,10 +20,12 @@ namespace Logging.Interceptors
             if (executedAction.Exception != null)
             {
                 _root.WriteToFile();
-                throw executedAction.Exception;
+                if (!LoggerConfiguration.IsSupressingExcetions)
+                    throw executedAction.Exception;
             }
-            //if(!LogOnlyOnError)
-            _root.WriteToFile();
+            else if (!LoggerConfiguration.IsLoggingOnlyOnExceptions)
+                _root.WriteToFile();
+
         }
         private void LogControllerEntry(ActionExecutingContext context)
         {

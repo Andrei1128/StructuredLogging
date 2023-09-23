@@ -1,4 +1,5 @@
 ﻿using Castle.DynamicProxy;
+using Logging.Configurations;
 using Logging.Manager;
 using Logging.Objects;
 
@@ -45,8 +46,11 @@ namespace Logging.Interceptors
             catch (Exception ex)
             {
                 current.Exit = new LogExit(DateTime.Now, ex);
-                _root.WriteToFile();
-                throw;
+                if (!LoggerConfiguration.IsSupressingExcetions)
+                {
+                    _root.WriteToFile();
+                    throw;
+                }
             }
             finally
             {

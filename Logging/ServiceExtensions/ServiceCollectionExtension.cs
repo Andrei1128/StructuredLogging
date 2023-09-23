@@ -11,18 +11,14 @@ namespace Logging.ServiceExtensions
         where TService : class
         where TImplementation : class, TService
         {
-            switch (lifetime)
+            _ = lifetime switch
             {
-                case ServiceLifetime.Scoped:
-                    services.AddScoped<TImplementation>();
-                    break;
-                case ServiceLifetime.Transient:
-                    services.AddTransient<TImplementation>();
-                    break;
-                case ServiceLifetime.Singleton:
-                    services.AddSingleton<TImplementation>();
-                    break;
-            }
+                ServiceLifetime.Scoped => services.AddScoped<TImplementation>(),
+                ServiceLifetime.Transient => services.AddTransient<TImplementation>(),
+                ServiceLifetime.Singleton => services.AddSingleton<TImplementation>(),
+                _ => throw new ArgumentOutOfRangeException(nameof(lifetime), $"Unsupported service lifetime: {lifetime}")
+            };
+
             services.Add(ServiceDescriptor.Describe(
                 typeof(TService),
                 provider =>
