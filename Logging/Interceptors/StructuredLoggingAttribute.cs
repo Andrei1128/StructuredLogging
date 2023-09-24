@@ -25,15 +25,14 @@ namespace Logging.Interceptors
             }
             else if (!LoggerConfiguration.IsLoggingOnlyOnExceptions)
                 _root.WriteToFile();
-
         }
         private void LogControllerEntry(ActionExecutingContext context)
         {
-            (string className, string methodName) names = GetNames(context);
+            (string className, string methodName) = GetNames(context);
             _root.LogEntry(
                 new LogEntry(DateTime.Now,
-                             names.className,
-                             names.methodName,
+                             className,
+                             methodName,
                              context.ActionArguments));
         }
         private void LogControllerExit(ActionExecutedContext executedAction)
@@ -66,8 +65,8 @@ namespace Logging.Interceptors
         private static (string className, string methodName) GetNames(ActionExecutingContext context)
         {
             string displayName = context.ActionDescriptor.DisplayName;
-            return (displayName.Substring(0, displayName.LastIndexOf('.')),
-                    displayName.Substring(displayName.LastIndexOf('.') + 1).Split(" ")[0]);
+            return (displayName[..displayName.LastIndexOf('.')],
+                    displayName[(displayName.LastIndexOf('.') + 1)..].Split(" ")[0]);
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Castle.DynamicProxy;
+using Logging.Configurations;
 using Logging.Interceptors;
+using Logging.Objects;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logging.ServiceExtensions
@@ -31,6 +33,15 @@ namespace Logging.ServiceExtensions
                 lifetime
             ));
             return services;
+        }
+        public static LoggerConfiguration CreateLogger(this IServiceCollection services)
+        {
+            services.AddSingleton<ProxyGenerator>();
+            services.AddScoped<ILog, Log>();
+            services.AddScoped<LogInterceptor>();
+            services.AddScoped<StructuredLoggingAttribute>();
+
+            return new LoggerConfiguration();
         }
     }
 }
