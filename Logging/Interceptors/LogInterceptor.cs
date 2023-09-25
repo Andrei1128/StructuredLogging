@@ -10,14 +10,14 @@ namespace Logging.Interceptors
         private readonly ILog _root;
         private readonly Stack<Log> CallStack = new();
         private bool IsCallStackRoot = true;
-        private Log Current;
+        //private Log Current; //this breaks
         public LogInterceptor(ILog root) => _root = root;
         public void Information(string info)
         {
-            if (Current == null || CallStack.Count == 0)
-                _root.Information(info);
-            else
-                Current.Infos.Add(info);
+            //if (Current == null || CallStack.Count == 0)
+            //    _root.Information(info);
+            //else
+            //    Current.Infos.Add(info);
         }
         public void Intercept(IInvocation invocation)
         {
@@ -26,7 +26,7 @@ namespace Logging.Interceptors
                 invocation.Proceed();
                 return;
             }
-            Current = new()
+            Log Current = new()
             {
                 Entry = new LogEntry(
                     DateTime.Now,
