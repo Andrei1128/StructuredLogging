@@ -4,12 +4,8 @@
     {
         public static bool IsSupressingExceptions { get; private set; } = false;
         public static bool IsLoggingOnlyOnExceptions { get; private set; } = false;
-        public LogWriter WriteTo { get; }
-
-        public LoggerConfiguration()
-        {
-            WriteTo = new LogWriter(this);
-        }
+        public WriterConfigurations WriteTo { get; }
+        public LoggerConfiguration() => WriteTo = new WriterConfigurations(this);
         public LoggerConfiguration SupressExceptions(bool flag = true)
         {
             IsSupressingExceptions = flag;

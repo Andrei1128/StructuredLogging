@@ -2,8 +2,7 @@
 {
     public class LogManager
     {
-        private static bool isLogging = false;
-        public static void StartLogging() => isLogging = true;
-        public static bool IsLogging() => isLogging;
+        public static bool IsLogging = false;
+        public static void StartLogging() => IsLogging = true;
     }
 }

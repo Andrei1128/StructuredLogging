@@ -8,8 +8,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.CreateLogger()
-    .SupressExceptions()
-    .LogOnlyOnExceptions();
+    .WriteTo.File(filePath: "..\\Logging\\logs");
 
 builder.Services.AddLogging<ITestService, TestService>(ServiceLifetime.Scoped);
 builder.Services.AddLogging<ITestRepository, TestRepository>(ServiceLifetime.Scoped);

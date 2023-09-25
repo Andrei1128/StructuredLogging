@@ -19,12 +19,12 @@ namespace Logging.Interceptors
             LogControllerExit(executedAction);
             if (executedAction.Exception != null)
             {
-                _root.WriteToFile();
+                _root.Write();
                 if (!LoggerConfiguration.IsSupressingExceptions)
                     throw executedAction.Exception;
             }
             else if (!LoggerConfiguration.IsLoggingOnlyOnExceptions)
-                _root.WriteToFile();
+                _root.Write();
         }
         private void LogControllerEntry(ActionExecutingContext context)
         {

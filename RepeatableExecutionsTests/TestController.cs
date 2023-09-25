@@ -8,15 +8,19 @@ namespace RepeatableExecutionsTests
     public class TestController : ControllerBase
     {
         private ITestService _testService;
-        public TestController(ITestService testService)
+        private ILogger2 _logger;
+        public TestController(ITestService testService, ILogger2 logger)
         {
             _testService = testService;
+            _logger = logger;
         }
         [HttpPost]
         [ServiceFilter(typeof(StructuredLoggingAttribute))]
         public string GetWeatherEndpoint()
         {
-            return _testService.Test("Ok_Service");
+            var result = _testService.Test("Ok_Service");
+            _logger.Information("conrollertest");
+            return result;
         }
     }
 }

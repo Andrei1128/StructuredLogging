@@ -5,21 +5,28 @@ using Logging.Objects;
 
 namespace Logging.Interceptors
 {
-    public class LogInterceptor : IInterceptor
+    public class LogInterceptor : ILogger2
     {
         private readonly ILog _root;
         private readonly Stack<Log> CallStack = new();
         private bool IsCallStackRoot = true;
+        private Log Current;
         public LogInterceptor(ILog root) => _root = root;
+        public void Information(string info)
+        {
+            if (Current == null || CallStack.Count == 0)
+                _root.Information(info);
+            else
+                Current.Infos.Add(info);
+        }
         public void Intercept(IInvocation invocation)
         {
-            if (!LogManager.IsLogging())
+            if (!LogManager.IsLogging)
             {
                 invocation.Proceed();
                 return;
             }
-
-            Log current = new()
+            Current = new()
             {
                 Entry = new LogEntry(
                     DateTime.Now,
@@ -30,25 +37,25 @@ namespace Logging.Interceptors
             if (!IsCallStackRoot)
             {
                 Log parent = CallStack.Peek();
-                parent.Interactions.Add(current);
+                parent.Interactions.Add(Current);
             }
             else
             {
-                _root.LogInteraction(current);
+                _root.LogInteraction(Current);
                 IsCallStackRoot = false;
             }
-            CallStack.Push(current);
+            CallStack.Push(Current);
             try
             {
                 invocation.Proceed();
-                current.Exit = new LogExit(DateTime.Now, invocation.ReturnValue);
+                Current.Exit = new LogExit(DateTime.Now, invocation.ReturnValue);
             }
             catch (Exception ex)
             {
-                current.Exit = new LogExit(DateTime.Now, ex);
+                Current.Exit = new LogExit(DateTime.Now, ex);
                 if (!LoggerConfiguration.IsSupressingExceptions)
                 {
-                    _root.WriteToFile();
+                    _root.Write();
                     throw;
                 }
             }
@@ -57,5 +64,9 @@ namespace Logging.Interceptors
                 CallStack.Pop();
             }
         }
+    }
+    public interface ILogger2 : IInterceptor
+    {
+        public void Information(string info);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Logging.Configurations;
+using Newtonsoft.Json;
 
 namespace Logging.Objects
 {
@@ -6,25 +7,30 @@ namespace Logging.Objects
     {
         public LogEntry Entry { get; set; }
         public LogExit Exit { get; set; }
-        public List<Log> Interactions { get; set; } = new List<Log>();
+        public List<string> Infos { get; } = new List<string>();
+        public List<Log> Interactions { get; } = new List<Log>();
+        public void Information(string info) => Infos.Add(info);
         public void LogEntry(LogEntry entry) => Entry = entry;
         public void LogExit(LogExit exit) => Exit = exit;
         public void LogInteraction(Log interaction) => Interactions.Add(interaction);
-        public void WriteToFile()
+        public void Write()
         {
-            string folderPath = "../Logging/logs";
             string serializedLog = JsonConvert.SerializeObject(this);
-            var guid = Guid.NewGuid().ToString();
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-            File.WriteAllText($"{folderPath}/{guid}.json", serializedLog);
+            if (WriterConfigurations.IsWritingToFile)
+            {
+                string filePath = WriterConfigurations.FilePath;
+                if (!Directory.Exists(filePath))
+                    Directory.CreateDirectory(filePath);
+                File.WriteAllText($"{filePath}\\{WriterConfigurations.FileName}", serializedLog);
+            }
         }
     }
     public interface ILog
     {
+        public void Information(string info);
         public void LogEntry(LogEntry entry);
         public void LogExit(LogExit exit);
         public void LogInteraction(Log interaction);
-        public void WriteToFile();
+        public void Write();
     }
 }
