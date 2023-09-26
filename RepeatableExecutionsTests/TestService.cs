@@ -1,4 +1,4 @@
-﻿using Logging.Interceptors;
+﻿using ILogger = Logging.Interceptors.ILogger;
 
 namespace RepeatableExecutionsTests
 {
@@ -6,8 +6,8 @@ namespace RepeatableExecutionsTests
     {
         private readonly ITestRepository _repository;
         private readonly ITestRepository2 _repository2;
-        private readonly ILogger2 _logger;
-        public TestService(ITestRepository repository, ITestRepository2 repository2, ILogger2 logger)
+        private readonly ILogger _logger;
+        public TestService(ITestRepository repository, ITestRepository2 repository2, ILogger logger)
         {
             _repository = repository;
             _repository2 = repository2;
@@ -15,10 +15,12 @@ namespace RepeatableExecutionsTests
         }
         public string Test(string data)
         {
+            _logger.Information("Test_Service");
             var result = _repository.Test(data + "_Repository");
-            _logger.Information("testingtest");
+            _logger.Information("Test_Service");
             var result2 = _repository2.Test(data + "_Repository2");
-            return result + "_" + result2;
+            _logger.Information("Test_Service");
+            return "Test_Service";
         }
     }
     public interface ITestService

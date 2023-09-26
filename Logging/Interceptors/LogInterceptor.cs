@@ -5,19 +5,19 @@ using Logging.Objects;
 
 namespace Logging.Interceptors
 {
-    public class LogInterceptor : ILogger2
+    public class LogInterceptor : ILogger
     {
         private readonly ILog _root;
         private readonly Stack<Log> CallStack = new();
         private bool IsCallStackRoot = true;
-        //private Log Current; //this breaks
+        private Log Current;
         public LogInterceptor(ILog root) => _root = root;
         public void Information(string info)
         {
-            //if (Current == null || CallStack.Count == 0)
-            //    _root.Information(info);
-            //else
-            //    Current.Infos.Add(info);
+            if (Current == null || CallStack.Count == 0)
+                _root.Information(info);
+            else
+                Current.Infos.Add(info);
         }
         public void Intercept(IInvocation invocation)
         {
@@ -26,7 +26,7 @@ namespace Logging.Interceptors
                 invocation.Proceed();
                 return;
             }
-            Log Current = new()
+            Current = new Log()
             {
                 Entry = new LogEntry(
                     DateTime.Now,
@@ -48,24 +48,26 @@ namespace Logging.Interceptors
             try
             {
                 invocation.Proceed();
+                Current = CallStack.Pop();
                 Current.Exit = new LogExit(DateTime.Now, invocation.ReturnValue);
+                if (CallStack.TryPeek(out Log? current))
+                    Current = current;
             }
             catch (Exception ex)
             {
+                Current = CallStack.Pop();
                 Current.Exit = new LogExit(DateTime.Now, ex);
                 if (!LoggerConfiguration.IsSupressingExceptions)
                 {
                     _root.Write();
                     throw;
                 }
-            }
-            finally
-            {
-                CallStack.Pop();
+                else if (CallStack.TryPeek(out Log? current))
+                    Current = current;
             }
         }
     }
-    public interface ILogger2 : IInterceptor
+    public interface ILogger : IInterceptor
     {
         public void Information(string info);
     }

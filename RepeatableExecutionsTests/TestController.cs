@@ -1,5 +1,6 @@
 using Logging.Interceptors;
 using Microsoft.AspNetCore.Mvc;
+using ILogger = Logging.Interceptors.ILogger;
 
 namespace RepeatableExecutionsTests
 {
@@ -8,8 +9,8 @@ namespace RepeatableExecutionsTests
     public class TestController : ControllerBase
     {
         private ITestService _testService;
-        private ILogger2 _logger;
-        public TestController(ITestService testService, ILogger2 logger)
+        private ILogger _logger;
+        public TestController(ITestService testService, ILogger logger)
         {
             _testService = testService;
             _logger = logger;
@@ -18,9 +19,10 @@ namespace RepeatableExecutionsTests
         [ServiceFilter(typeof(StructuredLoggingAttribute))]
         public string GetWeatherEndpoint()
         {
+            _logger.Information("Test_Controller");
             var result = _testService.Test("Ok_Service");
-            _logger.Information("conrollertest");
-            return result;
+            _logger.Information("Test_Controller");
+            return "Test_Controller";
         }
     }
 }

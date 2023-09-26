@@ -25,7 +25,7 @@ namespace Logging.ServiceExtensions
                 provider =>
                 {
                     var proxyGenerator = provider.GetRequiredService<ProxyGenerator>();
-                    var logInterceptor = provider.GetRequiredService<ILogger2>();
+                    var logInterceptor = provider.GetRequiredService<ILogger>();
                     var implementationInstance = provider.GetRequiredService<TImplementation>();
                     var proxy = proxyGenerator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, logInterceptor);
                     return proxy;
@@ -38,7 +38,7 @@ namespace Logging.ServiceExtensions
         {
             services.AddSingleton<ProxyGenerator>();
             services.AddScoped<ILog, Log>();
-            services.AddScoped<ILogger2, LogInterceptor>();
+            services.AddScoped<ILogger, LogInterceptor>();
             services.AddScoped<StructuredLoggingAttribute>();
 
             return new LoggerConfiguration();

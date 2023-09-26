@@ -1,20 +1,20 @@
-﻿using Logging.Interceptors;
+﻿using ILogger = Logging.Interceptors.ILogger;
 
 namespace RepeatableExecutionsTests
 {
     public class TestAboveRepository : ITestAboveRepository
     {
-        private readonly ILogger2 _logger;
-        public TestAboveRepository(ILogger2 logger)
+        private readonly ILogger _logger;
+        public TestAboveRepository(ILogger logger)
         {
             _logger = logger;
         }
 
         public string Test(string data)
         {
-            _logger.Information("testAbove");
+            _logger.Information("Test_Above");
             var result = data;
-            return result;
+            return "Test_Above";
         }
     }
     public interface ITestAboveRepository
