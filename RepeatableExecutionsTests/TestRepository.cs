@@ -2,7 +2,8 @@
 
 namespace RepeatableExecutionsTests
 {
-    public class TestRepository : ITestRepository
+    public class TestRepository
+    //: ITestRepository
     {
         private readonly ITestAboveRepository _aboveRepository;
         private readonly ILogger _logger;

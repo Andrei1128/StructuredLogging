@@ -9,10 +9,10 @@ namespace Logging.Objects
         public LogExit Exit { get; set; }
         public List<string> Infos { get; } = new List<string>();
         public List<Log> Interactions { get; } = new List<Log>();
-        public void Information(string info) => Infos.Add(info);
+        public void AddInformation(string info) => Infos.Add(info);
         public void LogEntry(LogEntry entry) => Entry = entry;
         public void LogExit(LogExit exit) => Exit = exit;
-        public void LogInteraction(Log interaction) => Interactions.Add(interaction);
+        public void AddInteraction(Log interaction) => Interactions.Add(interaction);
         public void Write()
         {
             string serializedLog = JsonConvert.SerializeObject(this);
@@ -27,10 +27,10 @@ namespace Logging.Objects
     }
     public interface ILog
     {
-        public void Information(string info);
+        public void AddInformation(string info);
         public void LogEntry(LogEntry entry);
         public void LogExit(LogExit exit);
-        public void LogInteraction(Log interaction);
+        public void AddInteraction(Log interaction);
         public void Write();
     }
 }

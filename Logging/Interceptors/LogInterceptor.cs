@@ -10,15 +10,8 @@ namespace Logging.Interceptors
         private readonly ILog _root;
         private readonly Stack<Log> CallStack = new();
         private bool IsCallStackRoot = true;
-        private Log Current;
+        private Log? Current = null;
         public LogInterceptor(ILog root) => _root = root;
-        public void Information(string info)
-        {
-            if (Current == null || CallStack.Count == 0)
-                _root.Information(info);
-            else
-                Current.Infos.Add(info);
-        }
         public void Intercept(IInvocation invocation)
         {
             if (!LogManager.IsLogging)
@@ -36,12 +29,14 @@ namespace Logging.Interceptors
             };
             if (!IsCallStackRoot)
             {
-                Log parent = CallStack.Peek();
-                parent.Interactions.Add(Current);
+                if (CallStack.TryPeek(out Log? parent))
+                    parent.Interactions.Add(Current);
+                else
+                    _root.AddInteraction(Current);
             }
             else
             {
-                _root.LogInteraction(Current);
+                _root.AddInteraction(Current);
                 IsCallStackRoot = false;
             }
             CallStack.Push(Current);
@@ -66,9 +61,28 @@ namespace Logging.Interceptors
                     Current = current;
             }
         }
+        private void Log(string content, LogLevels level)
+        {
+            string log = $"[{level}] {content}";
+            if (Current == null || CallStack.Count == 0)
+                _root.AddInformation(log);
+            else
+                Current.Infos.Add(log);
+        }
+        public void Verbose(string content) => Log(content, LogLevels.Verbose);
+        public void Debug(string content) => Log(content, LogLevels.Debug);
+        public void Information(string content) => Log(content, LogLevels.Information);
+        public void Warning(string content) => Log(content, LogLevels.Warning);
+        public void Error(string content) => Log(content, LogLevels.Error);
+        public void Fatal(string content) => Log(content, LogLevels.Fatal);
     }
     public interface ILogger : IInterceptor
     {
-        public void Information(string info);
+        public void Verbose(string content);
+        public void Debug(string content);
+        public void Information(string content);
+        public void Warning(string content);
+        public void Error(string content);
+        public void Fatal(string content);
     }
 }
