@@ -11,14 +11,12 @@ builder.Services.RegisterLogger()
     .WriteTo.File(filePath: "..\\Logging\\logs");
 
 builder.Services.AddLoggedScoped<ITestService, TestService>();
-//builder.Services.AddLoggedScoped<ITestRepository, TestRepository>();
+builder.Services.AddLoggedScoped<ITestRepository, TestRepository>();
 builder.Services.AddLoggedScoped<ITestRepository2, TestRepository2>();
 builder.Services.AddLoggedScoped<ITestAboveRepository, TestAboveRepository>();
 
 //builder.Services.AddScoped<ITestService, TestService>();
-builder.Services.AddLoggedScoped<
-    //ITestRepository, 
-    TestRepository>();
+//builder.Services.AddScoped<ITestRepository, TestRepository>();
 //builder.Services.AddScoped<ITestRepository2, TestRepository2>();
 //builder.Services.AddScoped<ITestAboveRepository, TestAboveRepository>();
 
