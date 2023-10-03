@@ -36,7 +36,7 @@ namespace Logging.ServiceExtensions
             services.AddScoped<ILog, Log>();
             services.AddScoped<ILogger, LogInterceptor>();
             services.AddScoped<StructuredLoggingAttribute>();
-            return new LoggerConfiguration();
+            return new LoggerConfiguration(services.BuildServiceProvider());
         }
     }
 }

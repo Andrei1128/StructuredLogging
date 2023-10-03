@@ -1,4 +1,7 @@
-﻿namespace Logging.Configurations
+﻿using Logging.Objects;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Logging.Configurations
 {
     public class WriterConfigurations
     {
@@ -6,10 +9,16 @@
         public static string FilePath { get; private set; } = ".";
         public static string FileName { get; private set; } = $"log-{DateTime.Now:yyyyMMddHHmmssfffffff}";
         public static bool IsWritingToFile { get; private set; } = false;
-        public WriterConfigurations(LoggerConfiguration config) => _config = config;
-        public LoggerConfiguration SqlServer()
+        private IServiceProvider _serviceProvider;
+        public WriterConfigurations(LoggerConfiguration config, IServiceProvider serviceProvider)
         {
-            throw new NotImplementedException();
+            _config = config;
+            _serviceProvider = serviceProvider;
+        }
+        public LoggerConfiguration CustomWriter(Type writerType)
+        {
+            var log = _serviceProvider.GetRequiredService<ILog>();
+            Activator.CreateInstance(writerType, new object[] { log });
             return _config;
         }
         public LoggerConfiguration File(string filePath = ".")

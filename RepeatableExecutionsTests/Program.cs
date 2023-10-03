@@ -6,9 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.RegisterLogger()
-    .WriteTo.File(filePath: "..\\Logging\\logs");
+    .WriteTo.File(filePath: "..\\Logging\\logs")
+    .WriteTo.CustomWriter(typeof(Writer));
 
 builder.Services.AddLoggedScoped<ITestService, TestService>();
 builder.Services.AddLoggedScoped<ITestRepository, TestRepository>();
