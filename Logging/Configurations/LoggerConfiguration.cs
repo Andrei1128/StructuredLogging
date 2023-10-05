@@ -1,11 +1,13 @@
-﻿namespace Logging.Configurations
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace Logging.Configurations
 {
     public class LoggerConfiguration
     {
         public static bool IsSupressingExceptions { get; private set; } = false;
         public static bool IsLoggingOnlyOnExceptions { get; private set; } = false;
         public WriterConfigurations WriteTo { get; }
-        public LoggerConfiguration(IServiceProvider serviceProvide) => WriteTo = new WriterConfigurations(this, serviceProvide);
+        public LoggerConfiguration(IServiceCollection serviceCollection) => WriteTo = new WriterConfigurations(this, serviceCollection);
         public LoggerConfiguration SupressExceptions(bool flag = true)
         {
             IsSupressingExceptions = flag;

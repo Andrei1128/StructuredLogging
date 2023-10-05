@@ -1,5 +1,4 @@
-﻿using Logging.Objects;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Logging.Configurations
 {
@@ -9,16 +8,22 @@ namespace Logging.Configurations
         public static string FilePath { get; private set; } = ".";
         public static string FileName { get; private set; } = $"log-{DateTime.Now:yyyyMMddHHmmssfffffff}";
         public static bool IsWritingToFile { get; private set; } = false;
-        private IServiceProvider _serviceProvider;
-        public WriterConfigurations(LoggerConfiguration config, IServiceProvider serviceProvider)
+        private readonly IServiceCollection _serviceCollection;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly List<Type> CustomSinks = new();
+        public WriterConfigurations(LoggerConfiguration config, IServiceCollection serviceCollection)
         {
             _config = config;
-            _serviceProvider = serviceProvider;
+            _serviceCollection = serviceCollection;
+            _serviceProvider = serviceCollection.BuildServiceProvider();
         }
-        public LoggerConfiguration CustomWriter(Type writerType)
+        public static void RegisterCustomSinks()
         {
-            var log = _serviceProvider.GetRequiredService<ILog>();
-            Activator.CreateInstance(writerType, new object[] { log });
+        }
+        public LoggerConfiguration CustomWriter<TSink>() where TSink : class
+        {
+            CustomSinks.Add(typeof(TSink));
+            _serviceCollection.AddScoped<TSink>();
             return _config;
         }
         public LoggerConfiguration File(string filePath = ".")

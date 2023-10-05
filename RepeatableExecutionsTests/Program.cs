@@ -8,7 +8,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.RegisterLogger()
     .WriteTo.File(filePath: "..\\Logging\\logs")
-    .WriteTo.CustomWriter(typeof(Writer));
+    .WriteTo.CustomWriter<Writer>();
 
 builder.Services.AddLoggedScoped<ITestService, TestService>();
 builder.Services.AddLoggedScoped<ITestRepository, TestRepository>();

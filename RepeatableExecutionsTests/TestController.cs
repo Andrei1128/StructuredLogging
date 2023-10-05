@@ -10,16 +10,14 @@ namespace RepeatableExecutionsTests
     {
         private ITestService _testService;
         private ILogger _logger;
-        //private IServiceProvider _serviceProvider;
+        //private Writer _writer;
         public TestController(ITestService testService, ILogger logger
-            //, IServiceProvider serviceProvider
+            //, Writer writer
             )
         {
+            //_writer = writer;
             _testService = testService;
             _logger = logger;
-            //_serviceProvider = serviceProvider;
-            //var log = _serviceProvider.GetRequiredService<ILog>();
-            //Activator.CreateInstance(typeof(Writer), new object[] { log });
         }
         [HttpPost]
         [ServiceFilter(typeof(StructuredLoggingAttribute))]
