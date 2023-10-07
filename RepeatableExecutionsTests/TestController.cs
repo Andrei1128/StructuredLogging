@@ -10,12 +10,8 @@ namespace RepeatableExecutionsTests
     {
         private ITestService _testService;
         private ILogger _logger;
-        //private Writer _writer;
-        public TestController(ITestService testService, ILogger logger
-            //, Writer writer
-            )
+        public TestController(ITestService testService, ILogger logger)
         {
-            //_writer = writer;
             _testService = testService;
             _logger = logger;
         }

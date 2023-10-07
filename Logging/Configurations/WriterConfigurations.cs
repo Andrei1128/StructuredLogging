@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Logging.Configurations
 {
@@ -10,7 +11,7 @@ namespace Logging.Configurations
         public static bool IsWritingToFile { get; private set; } = false;
         private readonly IServiceCollection _serviceCollection;
         private readonly IServiceProvider _serviceProvider;
-        private readonly List<Type> CustomSinks = new();
+        private static readonly List<Type> CustomSinks = new();
         public WriterConfigurations(LoggerConfiguration config, IServiceCollection serviceCollection)
         {
             _config = config;
@@ -20,11 +21,20 @@ namespace Logging.Configurations
         public static void RegisterCustomSinks()
         {
         }
+        public LoggerConfiguration AddSinksMiddleware<TSink>() where TSink : class, IMiddleware
+        {
+            _serviceCollection.AddScoped<TSink>();
+            return _config;
+        }
         public LoggerConfiguration CustomWriter<TSink>() where TSink : class
         {
             CustomSinks.Add(typeof(TSink));
             _serviceCollection.AddScoped<TSink>();
             return _config;
+        }
+        public static List<Type> GetRegisteredTypes()
+        {
+            return CustomSinks;
         }
         public LoggerConfiguration File(string filePath = ".")
         {
