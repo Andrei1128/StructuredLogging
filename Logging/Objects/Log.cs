@@ -16,6 +16,11 @@ public class Log : ILog
     public void Write()
     {
         string? serializedLog = null;
+        if (WriterConfigurations.IsWritingToConsole)
+        {
+            serializedLog ??= JsonConvert.SerializeObject(this, Formatting.Indented);
+            Console.WriteLine(serializedLog);
+        }
         if (WriterConfigurations.IsWritingToFile)
         {
             serializedLog ??= JsonConvert.SerializeObject(this);
@@ -23,11 +28,6 @@ public class Log : ILog
             if (!Directory.Exists(filePath))
                 Directory.CreateDirectory(filePath);
             File.WriteAllText($"{filePath}\\{WriterConfigurations.FileName}", serializedLog);
-        }
-        if (WriterConfigurations.IsWritingToConsole)
-        {
-            serializedLog ??= JsonConvert.SerializeObject(this);
-            Console.WriteLine(serializedLog);
         }
         Notify();
     }
