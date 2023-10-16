@@ -6,10 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.RegisterLogger()
+
+builder.Services.AddLogger()
     .WriteTo.File(filePath: "..\\Logging\\logs")
-    .WriteTo.AddSinksMiddleware<SinksMiddleware>()
-    .WriteTo.CustomWriter<Writer>();
+    .WriteTo.Console()
+    .WriteTo.CustomSink<CustomSink>();
 
 builder.Services.AddLoggedScoped<ITestService, TestService>();
 builder.Services.AddLoggedScoped<ITestRepository, TestRepository>();
@@ -28,6 +29,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.CreateSinks();
+app.InitializeCustomSinks();
 
 app.Run();

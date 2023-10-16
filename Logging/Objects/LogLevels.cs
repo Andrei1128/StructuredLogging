@@ -1,12 +1,10 @@
-﻿namespace Logging.Objects
+﻿namespace Logging.Objects;
+public enum LogLevels
 {
-    public enum LogLevels
-    {
-        Verbose,
-        Debug,
-        Information,
-        Warning,
-        Error,
-        Fatal
-    }
+    Verbose,
+    Debug,
+    Information,
+    Warning,
+    Error,
+    Fatal
 }

@@ -1,48 +1,52 @@
 ﻿using Logging.Configurations;
 using Newtonsoft.Json;
 
-namespace Logging.Objects
+namespace Logging.Objects;
+public class Log : ILog
 {
-    public class Log : ILog
+    public LogEntry Entry { get; set; }
+    public LogExit Exit { get; set; }
+    public List<string> Infos { get; } = new List<string>();
+    public List<Log> Interactions { get; } = new List<Log>();
+    private readonly IList<IObserver> _observers = new List<IObserver>();
+    public void AddInformation(string info) => Infos.Add(info);
+    public void LogEntry(LogEntry entry) => Entry = entry;
+    public void LogExit(LogExit exit) => Exit = exit;
+    public void AddInteraction(Log interaction) => Interactions.Add(interaction);
+    public void Write()
     {
-        public LogEntry Entry { get; set; }
-        public LogExit Exit { get; set; }
-        public List<string> Infos { get; } = new List<string>();
-        public List<Log> Interactions { get; } = new List<Log>();
-        private readonly IList<IObserver> _observers = new List<IObserver>();
-        public void AddInformation(string info) => Infos.Add(info);
-        public void LogEntry(LogEntry entry) => Entry = entry;
-        public void LogExit(LogExit exit) => Exit = exit;
-        public void AddInteraction(Log interaction) => Interactions.Add(interaction);
-        public void Write()
+        string? serializedLog = null;
+        if (WriterConfigurations.IsWritingToFile)
         {
-            string serializedLog = JsonConvert.SerializeObject(this);
-            if (WriterConfigurations.IsWritingToFile)
-            {
-                string filePath = WriterConfigurations.FilePath;
-                if (!Directory.Exists(filePath))
-                    Directory.CreateDirectory(filePath);
-                File.WriteAllText($"{filePath}\\{WriterConfigurations.FileName}", serializedLog);
-            }
-            Notify();
+            serializedLog ??= JsonConvert.SerializeObject(this);
+            string filePath = WriterConfigurations.FilePath;
+            if (!Directory.Exists(filePath))
+                Directory.CreateDirectory(filePath);
+            File.WriteAllText($"{filePath}\\{WriterConfigurations.FileName}", serializedLog);
         }
-        public void Attach(IObserver observer) => _observers.Add(observer);
-        public void Detach(IObserver observer) => _observers.Remove(observer);
-        public void Notify()
+        if (WriterConfigurations.IsWritingToConsole)
         {
-            foreach (IObserver observer in _observers)
-                observer.Update(this);
+            serializedLog ??= JsonConvert.SerializeObject(this);
+            Console.WriteLine(serializedLog);
         }
+        Notify();
     }
-    public interface ILog
+    public void Attach(IObserver observer) => _observers.Add(observer);
+    public void Detach(IObserver observer) => _observers.Remove(observer);
+    public void Notify()
     {
-        public void AddInformation(string info);
-        public void LogEntry(LogEntry entry);
-        public void LogExit(LogExit exit);
-        public void AddInteraction(Log interaction);
-        public void Write();
-        void Attach(IObserver observer);
-        void Detach(IObserver observer);
-        void Notify();
+        foreach (IObserver observer in _observers)
+            observer.Write(this);
     }
+}
+public interface ILog
+{
+    public void AddInformation(string info);
+    public void LogEntry(LogEntry entry);
+    public void LogExit(LogExit exit);
+    public void AddInteraction(Log interaction);
+    public void Write();
+    void Attach(IObserver observer);
+    void Detach(IObserver observer);
+    void Notify();
 }

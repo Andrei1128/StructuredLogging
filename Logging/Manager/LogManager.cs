@@ -1,8 +1,6 @@
-﻿namespace Logging.Manager
+﻿namespace Logging.Manager;
+public class LogManager
 {
-    public class LogManager
-    {
-        public static bool IsLogging = false;
-        public static void StartLogging() => IsLogging = true;
-    }
+    public static bool IsLogging = false;
+    public static void StartLogging() => IsLogging = true;
 }
