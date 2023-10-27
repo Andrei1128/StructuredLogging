@@ -10,15 +10,13 @@ public class TestRepository : ITestRepository
         _aboveRepository = aboveRepository;
         _logger = logger;
     }
-    public string Test(string data)
+    public (string, TestObject) Test(string data, TestObject obj)
     {
-        _logger.Information("Test_Repo");
-        var result = _aboveRepository.Test(data + "_AboveRepository");
-        _logger.Information("Test_Repo");
-        return "Test_Repo";
+        var result = _aboveRepository.Test(data + "_AboveRepository", 1);
+        return (result, obj);
     }
 }
 public interface ITestRepository
 {
-    public string Test(string data);
+    public (string, TestObject) Test(string data, TestObject obj);
 }

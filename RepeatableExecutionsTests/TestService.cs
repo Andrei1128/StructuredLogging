@@ -14,17 +14,14 @@ public class TestService : ITestService
         _repository2 = repository2;
         _logger = logger;
     }
-    public string Test(string data)
+    public string Test(string data, int number, TestObject obj)
     {
-        _logger.Information("Test_Service");
-        var result = _repository.Test(data + "_Repository");
-        _logger.Information("Test_Service");
-        var result2 = _repository2.Test(data + "_Repository2");
-        _logger.Information("Test_Service");
+        var result = _repository.Test(data + "_Repository", obj);
+        _repository2.Test(data + "_Repository2", out string result2);
         return "Test_Service";
     }
 }
 public interface ITestService
 {
-    public string Test(string data);
+    public string Test(string data, int number, TestObject obj);
 }

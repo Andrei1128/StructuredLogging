@@ -18,12 +18,18 @@ public class Log : ILog
         string? serializedLog = null;
         if (WriterConfigurations.IsWritingToConsole)
         {
-            serializedLog ??= JsonConvert.SerializeObject(this, Formatting.Indented);
+            serializedLog ??= JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All
+            });
             Console.WriteLine(serializedLog);
         }
         if (WriterConfigurations.IsWritingToFile)
         {
-            serializedLog ??= JsonConvert.SerializeObject(this);
+            serializedLog ??= JsonConvert.SerializeObject(this, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All
+            });
             string filePath = WriterConfigurations.FilePath;
             if (!Directory.Exists(filePath))
                 Directory.CreateDirectory(filePath);

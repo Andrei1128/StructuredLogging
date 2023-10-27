@@ -7,21 +7,15 @@ using ILogger = Logging.Interceptors.ILogger;
 namespace Replaying;
 public class ReplayingTests
 {
-    //  "Entry": {
-    //  "Time": "2023-10-16T20:25:32.3975514+03:00",
-    //  "Class": "RepeatableExecutionsTests.TestController",
-    //  "Method": "GetWeatherEndpoint",
-    //  "Input": {}
-    //  },
-    //  "Exit": {
-    //  "Time": "2023-10-16T20:25:32.4013371+03:00",
-    //  "Output": "Test_Controller"
-    //  },
     [Fact]
     public void Replay()
     {
-        string serializedLog = File.ReadAllText("..\\..\\..\\..\\Logging\\logs\\log-202310162025293502471");
-        Log log = JsonConvert.DeserializeObject<Log>(serializedLog);
+        string serializedLog = File.ReadAllText("..\\..\\..\\..\\Logging\\logs\\log-202310271820317921424");
+        var settings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.All
+        };
+        Log? log = JsonConvert.DeserializeObject<Log>(serializedLog, settings);
 
         var testServiceMock = new Mock<ITestService>();
         var loggerMock = new Mock<ILogger>();
@@ -32,7 +26,9 @@ public class ReplayingTests
         var methodInfo = typeof(TestController).GetMethod(methodToCall);
         if (methodInfo != null)
         {
-            var result = methodInfo.Invoke(controller, null);
+            var input = log.Entry.Input;
+            var inputobj = input[0] as object[];
+            var result = methodInfo.Invoke(controller, inputobj);
         }
         else throw new InvalidOperationException($"Method '{methodToCall}' does not exist in the controller.");
     }

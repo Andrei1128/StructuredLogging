@@ -8,15 +8,14 @@ public class TestAboveRepository : ITestAboveRepository
     {
         _logger = logger;
     }
-
-    public string Test(string data)
+    //public string LoggedTest(string message, int number) => _logger.LogMethod(Test, message, number);
+    public string Test(string data, int number)
     {
-        _logger.Information("Test_Above");
-        var result = data;
-        return "Test_Above";
+        return "AboveTest";
     }
 }
 public interface ITestAboveRepository
 {
-    public string Test(string data);
+    //public string LoggedTest(string message, int number);
+    public string Test(string data, int number);
 }
