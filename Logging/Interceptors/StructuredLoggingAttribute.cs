@@ -32,9 +32,7 @@ public class StructuredLoggingAttribute : Attribute, IAsyncActionFilter
             new LogEntry(DateTime.Now,
                          className,
                          methodName,
-                         new object[] {
-                         context.ActionArguments
-                         }));
+                         context.ActionArguments.Values.ToArray()));
     }
     private void LogControllerExit(ActionExecutedContext executedAction)
     {
