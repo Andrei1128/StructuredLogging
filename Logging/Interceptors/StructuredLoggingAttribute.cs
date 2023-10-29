@@ -64,7 +64,15 @@ public class StructuredLoggingAttribute : Attribute, IAsyncActionFilter
     private static (string className, string methodName) GetNames(ActionExecutingContext context)
     {
         string displayName = context.ActionDescriptor.DisplayName;
-        return (displayName[..displayName.LastIndexOf('.')],
-                displayName[(displayName.LastIndexOf('.') + 1)..].Split(" ")[0]);
+
+        int openParenthesisIndex = displayName.LastIndexOf('(');
+        int closeParenthesisIndex = displayName.LastIndexOf(')');
+
+        string typeAndAssembly = displayName[..openParenthesisIndex].Trim();
+        string methodName = typeAndAssembly[(typeAndAssembly.LastIndexOf('.') + 1)..];
+        string typeName = typeAndAssembly[..typeAndAssembly.LastIndexOf('.')];
+        string assemblyName = displayName.Substring(openParenthesisIndex + 1, closeParenthesisIndex - openParenthesisIndex - 1);
+
+        return (string.Join(", ", typeName, assemblyName), methodName);
     }
 }

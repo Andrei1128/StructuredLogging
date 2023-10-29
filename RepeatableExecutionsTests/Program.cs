@@ -1,5 +1,6 @@
 using Logging.ServiceExtensions;
 using RepeatableExecutionsTests;
+using Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogger()
     .WriteTo.File(filePath: "..\\Logging\\logs")
-    .WriteTo.Console()
+    //.WriteTo.Console()
     .WriteTo.CustomSink<CustomSink>();
 
 builder.Services.AddLoggedScoped<ITestService, TestService>();

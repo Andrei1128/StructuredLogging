@@ -1,6 +1,6 @@
-﻿using ILogger = Logging.Interceptors.ILogger;
-
-namespace RepeatableExecutionsTests;
+﻿using RepeatableExecutionsTests;
+using ILogger = Logging.Interceptors.ILogger;
+namespace Service;
 public class TestService : ITestService
 {
     private readonly ITestRepository _repository;

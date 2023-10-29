@@ -8,6 +8,6 @@ public class CustomSink : IObserver
     public void Write(ILog subject)
     {
         string serializedLog = JsonConvert.SerializeObject(subject);
-        Console.WriteLine(serializedLog);
+        //Console.WriteLine(serializedLog);
     }
 }

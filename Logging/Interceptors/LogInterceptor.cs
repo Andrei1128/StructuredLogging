@@ -24,7 +24,9 @@ public class LogInterceptor : ILogger
         {
             Entry = new LogEntry(
                 DateTime.Now,
-                invocation.TargetType.FullName,
+                string.Join(", ",
+                    invocation.TargetType.FullName,
+                    invocation.TargetType.Assembly.ToString().Split(',')[0]),
                 invocation.Method.Name,
                 invocation.Arguments)
         };
