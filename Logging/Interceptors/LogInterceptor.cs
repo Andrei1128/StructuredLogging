@@ -23,10 +23,8 @@ public class LogInterceptor : ILogger
         Current = new Log()
         {
             Entry = new LogEntry(
-                DateTime.Now,
-                string.Join(", ",
-                    invocation.TargetType.FullName,
-                    invocation.TargetType.Assembly.ToString().Split(',')[0]),
+            DateTime.Now,
+                string.Join(",", invocation.TargetType.AssemblyQualifiedName.Split(',').Take(2)),
                 invocation.Method.Name,
                 invocation.Arguments)
         };

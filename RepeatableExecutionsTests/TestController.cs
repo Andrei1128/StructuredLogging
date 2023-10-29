@@ -34,10 +34,26 @@ public class TestController : ControllerBase
         {
             TypeNameHandling = TypeNameHandling.All
         });
+        //////////////////////////////////////////////////////////
 
+        var serviceLog = log.Interactions[0];
+        var serviceEntry = serviceLog.Entry;
+        Type serviceType = Type.GetType(serviceEntry.Class)!;
+        var service = Activator.CreateInstance(serviceType);
+        var serviceMethod = serviceType.GetMethod(serviceEntry.Method);
+        object[] serviceParams = log.Entry.Input;
+        ParameterInfo[] serviceParamInfo = serviceMethod.GetParameters();
+        for (int i = 0; i < serviceParams.Length; i++)
+        {
+            serviceParams[i] = Convert.ChangeType(serviceParams[i], serviceParamInfo[i].ParameterType);
+        }
+        var serviceResult = serviceMethod.Invoke(service, serviceParams);
+
+        //////////////////////////////////////////////////////////
         var dependencies = new object[]
         {
-            new Mock<ITestService>().Object,
+            //those will come from the log
+            service,
             new Mock<ILogger>().Object
         };
 
@@ -65,13 +81,13 @@ public class TestController : ControllerBase
   ""$type"": ""Logging.Objects.Log, Logging"",
   ""Entry"": {
     ""$type"": ""Logging.Objects.LogEntry, Logging"",
-    ""Time"": ""2023-10-29T18:23:48.428248+02:00"",
+    ""Time"": ""2023-10-29T19:07:14.1210023+02:00"",
     ""Class"": ""Tests.Objects.TestController, RepeatableExecutionsTests"",
     ""Method"": ""GetWeatherEndpoint"",
     ""Input"": {
       ""$type"": ""System.Object[], System.Private.CoreLib"",
       ""$values"": [
-        ""asd"",
+        ""asdasd"",
         12,
         {
           ""$type"": ""RepeatableExecutionsTests.TestObject, RepeatableExecutionsTests"",
@@ -95,8 +111,8 @@ public class TestController : ControllerBase
   },
   ""Exit"": {
     ""$type"": ""Logging.Objects.LogExit, Logging"",
-    ""Time"": ""2023-10-29T18:23:48.4321818+02:00"",
-    ""Output"": ""asd 12 string string 0 obj2: string 0""
+    ""Time"": ""2023-10-29T19:07:14.123511+02:00"",
+    ""Output"": ""asdasd 12 string string 0 obj2: string 0""
   },
   ""Infos"": {
     ""$type"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"",
@@ -110,13 +126,13 @@ public class TestController : ControllerBase
         ""$type"": ""Logging.Objects.Log, Logging"",
         ""Entry"": {
           ""$type"": ""Logging.Objects.LogEntry, Logging"",
-          ""Time"": ""2023-10-29T18:23:48.4294087+02:00"",
+          ""Time"": ""2023-10-29T19:07:14.1222241+02:00"",
           ""Class"": ""Service.TestService, RepeatableExecutionsTests"",
           ""Method"": ""Test"",
           ""Input"": {
             ""$type"": ""System.Object[], System.Private.CoreLib"",
             ""$values"": [
-              ""asd"",
+              ""asdasd"",
               1,
               {
                 ""$type"": ""RepeatableExecutionsTests.TestObject, RepeatableExecutionsTests"",
@@ -140,7 +156,7 @@ public class TestController : ControllerBase
         },
         ""Exit"": {
           ""$type"": ""Logging.Objects.LogExit, Logging"",
-          ""Time"": ""2023-10-29T18:23:48.4313145+02:00"",
+          ""Time"": ""2023-10-29T19:07:14.1228781+02:00"",
           ""Output"": ""Test_Service""
         },
         ""Infos"": {
@@ -151,135 +167,6 @@ public class TestController : ControllerBase
         ""Interactions"": {
           ""$type"": ""System.Collections.Generic.List`1[[Logging.Objects.Log, Logging]], System.Private.CoreLib"",
           ""$values"": [
-            {
-              ""$type"": ""Logging.Objects.Log, Logging"",
-              ""Entry"": {
-                ""$type"": ""Logging.Objects.LogEntry, Logging"",
-                ""Time"": ""2023-10-29T18:23:48.4302581+02:00"",
-                ""Class"": ""RepeatableExecutionsTests.TestRepository, RepeatableExecutionsTests"",
-                ""Method"": ""Test"",
-                ""Input"": {
-                  ""$type"": ""System.Object[], System.Private.CoreLib"",
-                  ""$values"": [
-                    ""asd_Repository"",
-                    {
-                      ""$type"": ""RepeatableExecutionsTests.TestObject, RepeatableExecutionsTests"",
-                      ""obj2"": {
-                        ""$type"": ""RepeatableExecutionsTests.TestObject2, RepeatableExecutionsTests"",
-                        ""name2"": ""string"",
-                        ""numbers"": {
-                          ""$type"": ""System.Int32[], System.Private.CoreLib"",
-                          ""$values"": [
-                            0
-                          ]
-                        },
-                        ""age2"": 0
-                      },
-                      ""name"": ""string"",
-                      ""lastName"": ""string"",
-                      ""age"": 0
-                    }
-                  ]
-                }
-              },
-              ""Exit"": {
-                ""$type"": ""Logging.Objects.LogExit, Logging"",
-                ""Time"": ""2023-10-29T18:23:48.4309731+02:00"",
-                ""Output"": {
-                  ""$type"": ""System.ValueTuple`2[[System.String, System.Private.CoreLib],[RepeatableExecutionsTests.TestObject, RepeatableExecutionsTests]], System.Private.CoreLib"",
-                  ""Item1"": ""AboveTest"",
-                  ""Item2"": {
-                    ""$type"": ""RepeatableExecutionsTests.TestObject, RepeatableExecutionsTests"",
-                    ""obj2"": {
-                      ""$type"": ""RepeatableExecutionsTests.TestObject2, RepeatableExecutionsTests"",
-                      ""name2"": ""string"",
-                      ""numbers"": {
-                        ""$type"": ""System.Int32[], System.Private.CoreLib"",
-                        ""$values"": [
-                          0
-                        ]
-                      },
-                      ""age2"": 0
-                    },
-                    ""name"": ""string"",
-                    ""lastName"": ""string"",
-                    ""age"": 0
-                  }
-                }
-              },
-              ""Infos"": {
-                ""$type"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"",
-                ""$values"": [
-                ]
-              },
-              ""Interactions"": {
-                ""$type"": ""System.Collections.Generic.List`1[[Logging.Objects.Log, Logging]], System.Private.CoreLib"",
-                ""$values"": [
-                  {
-                    ""$type"": ""Logging.Objects.Log, Logging"",
-                    ""Entry"": {
-                      ""$type"": ""Logging.Objects.LogEntry, Logging"",
-                      ""Time"": ""2023-10-29T18:23:48.4306122+02:00"",
-                      ""Class"": ""RepeatableExecutionsTests.TestAboveRepository, RepeatableExecutionsTests"",
-                      ""Method"": ""Test"",
-                      ""Input"": {
-                        ""$type"": ""System.Object[], System.Private.CoreLib"",
-                        ""$values"": [
-                          ""asd_Repository_AboveRepository"",
-                          1
-                        ]
-                      }
-                    },
-                    ""Exit"": {
-                      ""$type"": ""Logging.Objects.LogExit, Logging"",
-                      ""Time"": ""2023-10-29T18:23:48.430855+02:00"",
-                      ""Output"": ""AboveTest""
-                    },
-                    ""Infos"": {
-                      ""$type"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"",
-                      ""$values"": [
-                      ]
-                    },
-                    ""Interactions"": {
-                      ""$type"": ""System.Collections.Generic.List`1[[Logging.Objects.Log, Logging]], System.Private.CoreLib"",
-                      ""$values"": [
-                      ]
-                    }
-                  }
-                ]
-              }
-            },
-            {
-              ""$type"": ""Logging.Objects.Log, Logging"",
-              ""Entry"": {
-                ""$type"": ""Logging.Objects.LogEntry, Logging"",
-                ""Time"": ""2023-10-29T18:23:48.4311301+02:00"",
-                ""Class"": ""RepeatableExecutionsTests.TestRepository2, RepeatableExecutionsTests"",
-                ""Method"": ""Test"",
-                ""Input"": {
-                  ""$type"": ""System.Object[], System.Private.CoreLib"",
-                  ""$values"": [
-                    ""asd_Repository2"",
-                    ""Test_Repo2""
-                  ]
-                }
-              },
-              ""Exit"": {
-                ""$type"": ""Logging.Objects.LogExit, Logging"",
-                ""Time"": ""2023-10-29T18:23:48.4313088+02:00"",
-                ""Output"": null
-              },
-              ""Infos"": {
-                ""$type"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"",
-                ""$values"": [
-                ]
-              },
-              ""Interactions"": {
-                ""$type"": ""System.Collections.Generic.List`1[[Logging.Objects.Log, Logging]], System.Private.CoreLib"",
-                ""$values"": [
-                ]
-              }
-            }
           ]
         }
       }
