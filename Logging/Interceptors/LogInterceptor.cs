@@ -2,8 +2,6 @@
 using Logging.Configurations;
 using Logging.Manager;
 using Logging.Objects;
-using System.Diagnostics;
-using System.Reflection;
 
 namespace Logging.Interceptors;
 public class LogInterceptor : ILogger
@@ -23,7 +21,7 @@ public class LogInterceptor : ILogger
         Current = new Log()
         {
             Entry = new LogEntry(
-            DateTime.Now,
+                DateTime.Now,
                 string.Join(",", invocation.TargetType.AssemblyQualifiedName.Split(',').Take(2)),
                 invocation.Method.Name,
                 invocation.Arguments)
@@ -62,56 +60,56 @@ public class LogInterceptor : ILogger
                 Current = current;
         }
     }
-    public TOutput LogMethod<TOutput>(Func<object[], TOutput> action, params object[] inputs)
-    {
-        if (!LogManager.IsLogging)
-            return action.Invoke(inputs);
-        TOutput output = default;
-        var stackFrame = new StackFrame(2);
-        MethodBase method = stackFrame.GetMethod();
-        Current = new Log()
-        {
-            Entry = new LogEntry(
-                DateTime.Now,
-                method.ReflectedType.FullName,
-                method.Name,
-                inputs)
-        };
-        if (!IsCallStackRoot)
-        {
-            if (CallStack.TryPeek(out Log? parent))
-                parent.Interactions.Add(Current);
-            else
-                _root.AddInteraction(Current);
-        }
-        else
-        {
-            _root.AddInteraction(Current);
-            IsCallStackRoot = false;
-        }
-        CallStack.Push(Current);
-        try
-        {
-            output = action.Invoke(inputs);
-            Current = CallStack.Pop();
-            Current.Exit = new LogExit(DateTime.Now, output);
-            if (CallStack.TryPeek(out Log? current))
-                Current = current;
-        }
-        catch (Exception ex)
-        {
-            Current = CallStack.Pop();
-            Current.Exit = new LogExit(DateTime.Now, ex);
-            if (!LoggerConfiguration.IsSupressingExceptions)
-            {
-                _root.Write();
-                throw;
-            }
-            else if (CallStack.TryPeek(out Log? current))
-                Current = current;
-        }
-        return output;
-    }
+    //public TOutput LogMethod<TOutput>(Func<object[], TOutput> action, params object[] inputs)
+    //{
+    //    if (!LogManager.IsLogging)
+    //        return action.Invoke(inputs);
+    //    TOutput output = default;
+    //    var stackFrame = new StackFrame(2);
+    //    MethodBase method = stackFrame.GetMethod();
+    //    Current = new Log()
+    //    {
+    //        Entry = new LogEntry(
+    //            DateTime.Now,
+    //            method.ReflectedType.FullName,
+    //            method.Name,
+    //            inputs)
+    //    };
+    //    if (!IsCallStackRoot)
+    //    {
+    //        if (CallStack.TryPeek(out Log? parent))
+    //            parent.Interactions.Add(Current);
+    //        else
+    //            _root.AddInteraction(Current);
+    //    }
+    //    else
+    //    {
+    //        _root.AddInteraction(Current);
+    //        IsCallStackRoot = false;
+    //    }
+    //    CallStack.Push(Current);
+    //    try
+    //    {
+    //        output = action.Invoke(inputs);
+    //        Current = CallStack.Pop();
+    //        Current.Exit = new LogExit(DateTime.Now, output);
+    //        if (CallStack.TryPeek(out Log? current))
+    //            Current = current;
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Current = CallStack.Pop();
+    //        Current.Exit = new LogExit(DateTime.Now, ex);
+    //        if (!LoggerConfiguration.IsSupressingExceptions)
+    //        {
+    //            _root.Write();
+    //            throw;
+    //        }
+    //        else if (CallStack.TryPeek(out Log? current))
+    //            Current = current;
+    //    }
+    //    return output;
+    //}
     private void Log(string content, LogLevels level)
     {
         string log = $"[{level}] {content}";
@@ -129,7 +127,7 @@ public class LogInterceptor : ILogger
 }
 public interface ILogger : IInterceptor
 {
-    public TOutput LogMethod<TOutput>(Func<object[], TOutput> action, params object[] inputs);
+    //public TOutput LogMethod<TOutput>(Func<object[], TOutput> action, params object[] inputs);
     public void Verbose(string content);
     public void Debug(string content);
     public void Information(string content);

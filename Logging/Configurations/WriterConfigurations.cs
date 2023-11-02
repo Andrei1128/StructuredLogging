@@ -6,9 +6,7 @@ public class WriterConfigurations
 {
     private readonly LoggerConfiguration _config;
     public static string FilePath { get; private set; } = ".";
-    public static string FileName { get; private set; } = $"log-{DateTime.Now:yyyyMMddHHmmssfffffff}";
     public static bool IsWritingToFile { get; private set; } = false;
-    public static bool IsWritingToConsole { get; private set; } = false;
     private readonly IServiceCollection _serviceCollection;
     private static readonly List<Type> CustomSinks = new();
     public WriterConfigurations(LoggerConfiguration config, IServiceCollection serviceCollection)
@@ -30,11 +28,6 @@ public class WriterConfigurations
     {
         IsWritingToFile = true;
         FilePath = filePath;
-        return _config;
-    }
-    public LoggerConfiguration Console()
-    {
-        IsWritingToConsole = true;
         return _config;
     }
 }

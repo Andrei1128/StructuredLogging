@@ -49,33 +49,67 @@ public class TestController : ControllerBase
         }
         var serviceResult = serviceMethod.Invoke(service, serviceParams);
 
-        //////////////////////////////////////////////////////////
-        var dependencies = new object[]
-        {
-            //those will come from the log
-            service,
-            new Mock<ILogger>().Object
-        };
+        /////////////////////////////////////////////////////////////
+        ///
+
 
         var entry = log.Entry;
         Type classType = Type.GetType(entry.Class)!;
-        if (classType != null)
+
+        ConstructorInfo[] constructors = classType.GetConstructors();
+        //constructor may be 0
+        if (constructors.Length == 0)
         {
-            var controller = Activator.CreateInstance(classType, dependencies);
-            var methodInfo = classType.GetMethod(entry.Method);
-            if (methodInfo != null)
-            {
-                object[] parameters = log.Entry.Input;
-                ParameterInfo[] parameterInfos = methodInfo.GetParameters();
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    parameters[i] = Convert.ChangeType(parameters[i], parameterInfos[i].ParameterType);
-                }
-                var result = methodInfo.Invoke(controller, parameters);
-            }
-            else throw new InvalidOperationException($"Method '{entry.Method}' does not exist.");
+            //return;
         }
-        else throw new InvalidOperationException($"Class '{entry.Method}' does not exist.");
+
+        ConstructorInfo constructor = constructors
+            .OrderByDescending(c => c.GetParameters().Length)
+            .First();
+        ParameterInfo[] constructorParameters = constructor.GetParameters();
+        List<object> dependencies = new List<object>();
+        dependencies.Add(service);
+        foreach (var dependency in dependencies)
+        {
+            Console.WriteLine(dependency.GetType());
+        }
+        Console.WriteLine();
+        foreach (var dependency in constructorParameters)
+        {
+            Console.WriteLine(dependency.ParameterType);
+        }
+        Console.WriteLine();
+        for (int i = 0; i < constructorParameters.Length; i++)
+        {
+            var param = constructorParameters[i];
+            if (!dependencies.Any(d => d.GetType() == param.ParameterType))
+            {
+                var mockType = typeof(Mock<>).MakeGenericType(param.ParameterType);
+                var mock = Activator.CreateInstance(mockType);
+                dependencies.Add(((Mock)mock).Object);
+            }
+        }
+        foreach (var dependency in dependencies)
+        {
+            Console.WriteLine(dependency);
+        }
+        //if (classType != null)
+        //{
+        //    var controller = Activator.CreateInstance(classType, dependencies);
+        //    var methodInfo = classType.GetMethod(entry.Method);
+        //    if (methodInfo != null)
+        //    {
+        //        object[] parameters = log.Entry.Input;
+        //        ParameterInfo[] parameterInfos = methodInfo.GetParameters();
+        //        for (int i = 0; i < parameters.Length; i++)
+        //        {
+        //            parameters[i] = Convert.ChangeType(parameters[i], parameterInfos[i].ParameterType);
+        //        }
+        //        var result = methodInfo.Invoke(controller, parameters);
+        //    }
+        //    else throw new InvalidOperationException($"Method '{entry.Method}' does not exist.");
+        //}
+        //else throw new InvalidOperationException($"Class '{entry.Method}' does not exist.");
     }
     public string serializedLog = @"{
   ""$type"": ""Logging.Objects.Log, Logging"",

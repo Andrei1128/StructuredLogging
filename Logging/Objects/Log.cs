@@ -15,44 +15,46 @@ public class Log : ILog
     public void AddInteraction(Log interaction) => Interactions.Add(interaction);
     public void Write()
     {
-        string? serializedLog = null;
-        if (WriterConfigurations.IsWritingToConsole)
+        var jsonSettings = new JsonSerializerSettings
         {
-            serializedLog ??= JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.All
-            });
-            Console.WriteLine(serializedLog);
-        }
+            TypeNameHandling = TypeNameHandling.All
+        };
+        string? serializedLog = JsonConvert.SerializeObject(this, jsonSettings); ;
         if (WriterConfigurations.IsWritingToFile)
         {
-            serializedLog ??= JsonConvert.SerializeObject(this, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.All
-            });
             string filePath = WriterConfigurations.FilePath;
             if (!Directory.Exists(filePath))
                 Directory.CreateDirectory(filePath);
-            File.WriteAllText($"{filePath}\\{WriterConfigurations.FileName}", serializedLog);
+            File.WriteAllText($"{filePath}\\{Entry.Method}-{DateTime.Now:yyyyMMddHHmmssfffffff}", serializedLog);
         }
-        Notify();
+        Notify(serializedLog);
     }
     public void Attach(IObserver observer) => _observers.Add(observer);
     public void Detach(IObserver observer) => _observers.Remove(observer);
-    public void Notify()
+    public void Notify(string serializedLog)
     {
-        foreach (IObserver observer in _observers)
-            observer.Write(this);
+        //Parallel.ForEach(_observers, (observer) =>
+        //{
+        //    observer.Write(serializedLog);
+        //});
+        foreach (var observer in _observers)
+        {
+            observer.Write(serializedLog);
+        }
     }
 }
-public interface ILog
+public interface ILog : IObservable
 {
     public void AddInformation(string info);
     public void LogEntry(LogEntry entry);
     public void LogExit(LogExit exit);
     public void AddInteraction(Log interaction);
     public void Write();
+
+}
+public interface IObservable
+{
     void Attach(IObserver observer);
     void Detach(IObserver observer);
-    void Notify();
+    void Notify(string serializedLog);
 }

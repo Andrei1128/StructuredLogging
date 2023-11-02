@@ -1,13 +1,12 @@
 ﻿using Logging.Objects;
-using Newtonsoft.Json;
 
 namespace RepeatableExecutionsTests;
-public class CustomSink : IObserver
+public class CustomSink : Observer
 {
-    public CustomSink(ILog log) => log.Attach(this);
-    public void Write(ILog subject)
+    public CustomSink(ILog log) : base(log) { }
+
+    public override async Task Write(string subject)
     {
-        string serializedLog = JsonConvert.SerializeObject(subject);
-        //Console.WriteLine(serializedLog);
+        await Console.Out.WriteLineAsync(subject);
     }
 }
