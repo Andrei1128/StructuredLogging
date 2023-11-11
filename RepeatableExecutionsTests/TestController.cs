@@ -1,3 +1,4 @@
+using Castle.DynamicProxy;
 using Logging.Interceptors;
 using Logging.Objects;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,9 @@ public class TestController : ControllerBase
         {
             TypeNameHandling = TypeNameHandling.All
         });
+
+        var generator = new ProxyGenerator();
+
         var entry = log.Entry;
         Type? classType = Type.GetType(entry.Class);
         if (classType != null)
@@ -51,8 +55,9 @@ public class TestController : ControllerBase
                 foreach (var param in constructorParameters)
                 {
                     Type paramType = param.ParameterType;
-                    Type mockType = typeof(Mock<>).MakeGenericType(paramType);
-                    var mock = Activator.CreateInstance(mockType);
+                    Type genericMockType = typeof(Mock<>).MakeGenericType(paramType);
+                    var mock = Activator.CreateInstance(genericMockType);
+                    object proxiedMock = null;
                     foreach (var interaction in interactions)
                     {
                         Type thisClassType = Type.GetType(interaction.Entry.Class);
@@ -63,24 +68,26 @@ public class TestController : ControllerBase
                             MethodInfo thisMethodInfo = thisClassType.GetMethod(method);
                             if (thisMethodInfo != null)
                             {
-
-                                // you are here!
-
-                                var setup = mock.GetType().GetMethod("Setup")
-                                    .MakeGenericMethod(thisMethodInfo.ReturnType)
-                                    .Invoke(mock, new object[] { thisMethodInfo });
-
-                                setup.GetType().GetMethod("Returns")
-                                    .MakeGenericMethod(thisMethodInfo.ReturnType)
-                                    .Invoke(setup, new[] { output });
+                                var replayInterceptor = new ReplayInterceptor(method, null, output);
+                                var mockObject = ((Mock)mock).Object;
+                                Type mockType = mockObject.GetType();
+                                if (mockObject as TestService != null) // TODO: make the conversion using 'properMockType'
+                                {
+                                    proxiedMock = generator.CreateClassProxyWithTarget(mockObject, replayInterceptor);
+                                }
                             }
                         }
                     }
-                    var mockObject = ((Mock)mock).Object;
-                    dependenciesList.Add(mockObject);
+                    if (proxiedMock == null)
+                        dependenciesList.Add(((Mock)mock).Object);
+                    else dependenciesList.Add(proxiedMock);
                 }
             }
             object[]? dependencies = dependenciesList.Count == 0 ? null : dependenciesList.ToArray();
+            foreach (var dep in dependencies)
+            {
+                Console.WriteLine(dep.GetType());
+            }
             var instance = Activator.CreateInstance(classType, dependencies);
             var methodInfo = classType.GetMethod(entry.Method);
             if (methodInfo != null)
