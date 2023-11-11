@@ -1,4 +1,4 @@
-﻿namespace Logging.Objects;
+﻿namespace Logging.Logging.Objects;
 public class LogEntry
 {
     public DateTime Time { get; }

@@ -1,5 +1,5 @@
 ﻿using RepeatableExecutionsTests;
-using ILogger = Logging.Interceptors.ILogger;
+using ILogger = Logging.Logging.Interceptors.ILogger;
 namespace Service;
 public class TestService : ITestService
 {

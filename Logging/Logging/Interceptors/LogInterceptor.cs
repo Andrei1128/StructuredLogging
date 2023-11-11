@@ -1,9 +1,9 @@
 ﻿using Castle.DynamicProxy;
-using Logging.Configurations;
-using Logging.Manager;
-using Logging.Objects;
+using Logging.Logging.Configurations;
+using Logging.Logging.Manager;
+using Logging.Logging.Objects;
 
-namespace Logging.Interceptors;
+namespace Logging.Logging.Interceptors;
 public class LogInterceptor : ILogger
 {
     private readonly ILog _root;
@@ -11,7 +11,7 @@ public class LogInterceptor : ILogger
     private bool IsCallStackRoot = true;
     private Log? Current = null;
     public LogInterceptor(ILog root) => _root = root;
-    public void Intercept(Castle.DynamicProxy.IInvocation invocation)
+    public void Intercept(IInvocation invocation)
     {
         if (!LogManager.IsLogging)
         {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Logging.Configurations;
+namespace Logging.Logging.Configurations;
 public class LoggerConfiguration
 {
     public static bool IsSupressingExceptions { get; private set; } = false;

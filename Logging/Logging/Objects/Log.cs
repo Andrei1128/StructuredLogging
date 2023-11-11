@@ -1,7 +1,7 @@
-﻿using Logging.Configurations;
+﻿using Logging.Logging.Configurations;
 using Newtonsoft.Json;
 
-namespace Logging.Objects;
+namespace Logging.Logging.Objects;
 public class Log : ILog
 {
     public LogEntry Entry { get; set; }

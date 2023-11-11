@@ -1,10 +1,10 @@
-﻿using Logging.Configurations;
-using Logging.Manager;
-using Logging.Objects;
+﻿using Logging.Logging.Configurations;
+using Logging.Logging.Manager;
+using Logging.Logging.Objects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Logging.Interceptors;
+namespace Logging.Logging.Interceptors;
 [AttributeUsage(AttributeTargets.Method)]
 public class StructuredLoggingAttribute : Attribute, IAsyncActionFilter
 {

@@ -1,4 +1,4 @@
-﻿namespace Logging.Objects;
+﻿namespace Logging.Logging.Objects;
 public class LogExit
 {
     public DateTime Time { get; }

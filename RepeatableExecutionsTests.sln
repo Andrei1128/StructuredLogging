@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepeatableExecutionsTests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logging", "Logging\Logging.csproj", "{AFFA3D5C-3D08-4AA8-A553-1E1B803405A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Replaying", "Replaying\Replaying.csproj", "{8FFEB018-4AB1-4B30-AC70-7D0EF1AADA52}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{AFFA3D5C-3D08-4AA8-A553-1E1B803405A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFFA3D5C-3D08-4AA8-A553-1E1B803405A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFFA3D5C-3D08-4AA8-A553-1E1B803405A3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8FFEB018-4AB1-4B30-AC70-7D0EF1AADA52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8FFEB018-4AB1-4B30-AC70-7D0EF1AADA52}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8FFEB018-4AB1-4B30-AC70-7D0EF1AADA52}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8FFEB018-4AB1-4B30-AC70-7D0EF1AADA52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,4 @@
-﻿using ILogger = Logging.Interceptors.ILogger;
+﻿using ILogger = Logging.Logging.Interceptors.ILogger;
 
 namespace RepeatableExecutionsTests;
 public class TestRepository : ITestRepository

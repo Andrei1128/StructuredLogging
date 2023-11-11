@@ -1,7 +1,7 @@
-﻿using Logging.Objects;
+﻿using Logging.Logging.Objects;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Logging.Configurations;
+namespace Logging.Logging.Configurations;
 public class WriterConfigurations
 {
     private readonly LoggerConfiguration _config;

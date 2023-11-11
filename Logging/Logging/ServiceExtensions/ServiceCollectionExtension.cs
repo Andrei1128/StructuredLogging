@@ -1,7 +1,7 @@
 ﻿using Castle.DynamicProxy;
-using Logging.Configurations;
-using Logging.Interceptors;
-using Logging.Objects;
+using Logging.Logging.Configurations;
+using Logging.Logging.Interceptors;
+using Logging.Logging.Objects;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Logging.ServiceExtensions;

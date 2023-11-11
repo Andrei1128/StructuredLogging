@@ -1,4 +1,4 @@
-﻿using Logging.Objects;
+﻿using Logging.Logging.Objects;
 
 namespace RepeatableExecutionsTests;
 public class CustomSink : Observer

@@ -1,4 +1,4 @@
-﻿namespace Logging.Objects;
+﻿namespace Logging.Logging.Objects;
 public abstract class Observer : IObserver
 {
     public Observer(ILog log) => log.Attach(this);

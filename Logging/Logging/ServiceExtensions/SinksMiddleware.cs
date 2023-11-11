@@ -1,4 +1,4 @@
-using Logging.Configurations;
+using Logging.Logging.Configurations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 

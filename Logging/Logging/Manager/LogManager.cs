@@ -1,4 +1,4 @@
-﻿namespace Logging.Manager;
+﻿namespace Logging.Logging.Manager;
 public class LogManager
 {
     public static bool IsLogging = false;
