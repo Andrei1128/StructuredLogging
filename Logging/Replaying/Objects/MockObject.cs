@@ -1,11 +1,16 @@
-﻿namespace Logging.Replaying.Objects;
+﻿using System.Diagnostics;
+
+namespace Logging.Replaying.Objects;
 
 public class MockObject
 {
+    public int Id { get; }
     public string Method { get; }
     public object? Output { get; }
-    public MockObject(string method, object? output)
+    [DebuggerStepThrough]
+    public MockObject(int id, string method, object? output)
     {
+        Id = id;
         Method = method;
         Output = output;
     }

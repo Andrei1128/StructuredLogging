@@ -27,7 +27,15 @@ public static partial class ServiceCollectionExtensions
                 var proxyGenerator = provider.GetRequiredService<ProxyGenerator>();
                 var logInterceptor = provider.GetRequiredService<ILogger>();
                 var implementationInstance = provider.GetRequiredService<TImplementation>();
-                var proxy = proxyGenerator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, logInterceptor);
+                TService? proxy = null;
+                if (typeof(TService).IsInterface)
+                {
+                    proxy = proxyGenerator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, logInterceptor);
+                }
+                else
+                {
+                    proxy = proxyGenerator.CreateClassProxyWithTarget<TService>(implementationInstance, logInterceptor);
+                }
                 return proxy;
             },
             lifetime

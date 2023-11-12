@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 namespace Logging.Logging.Objects;
 public class Log : ILog
 {
+    public int Id { get; init; } = 0;
     public LogEntry Entry { get; set; }
     public LogExit Exit { get; set; }
     public List<string> Infos { get; } = new List<string>();

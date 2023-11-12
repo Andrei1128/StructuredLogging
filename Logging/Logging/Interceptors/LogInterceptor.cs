@@ -7,6 +7,7 @@ namespace Logging.Logging.Interceptors;
 public class LogInterceptor : ILogger
 {
     private readonly ILog _root;
+    private int nodeId = 1;
     private readonly Stack<Log> CallStack = new();
     private bool IsCallStackRoot = true;
     private Log? Current = null;
@@ -20,6 +21,7 @@ public class LogInterceptor : ILogger
         }
         Current = new Log()
         {
+            Id = nodeId++,
             Entry = new LogEntry(
                 DateTime.Now,
                 string.Join(",", invocation.TargetType.AssemblyQualifiedName.Split(',').Take(2)),

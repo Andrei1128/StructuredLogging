@@ -12,7 +12,7 @@ public class Replayer
     private readonly ProxyGenerator proxyGenerator = new();
     public void Replay()
     {
-        string serializedLog = File.ReadAllText("C:\\Users\\Andrei\\Facultate\\C#\\RepeatableExecutionsTests\\Logging\\logs\\GetWeatherEndpoint-202311112046292981154");
+        string serializedLog = File.ReadAllText("C:\\Users\\Andrei\\Facultate\\C#\\RepeatableExecutionsTests\\Logging\\logs\\GetWeatherEndpoint-202311121129291238324");
         var jsonSettings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
         Log log = JsonConvert.DeserializeObject<Log>(serializedLog, jsonSettings);
 
@@ -59,22 +59,6 @@ public class Replayer
         }
         return Array.Empty<ParameterInfo>();
     }
-    private object[]? CreateDummyDependencies(Type classType)
-    {
-        List<object> dependenciesList = new();
-        ParameterInfo[] constructorParameters = GetConstructorParameters(classType);
-        if (constructorParameters.Any())
-        {
-            foreach (var param in constructorParameters)
-            {
-                Type paramType = param.ParameterType;
-                Type genericMockType = typeof(Mock<>).MakeGenericType(paramType);
-                var mock = Activator.CreateInstance(genericMockType);
-                dependenciesList.Add(((Mock)mock).Object);
-            }
-        }
-        return dependenciesList.Any() ? dependenciesList.ToArray() : null;
-    }
     private object[]? CreateMockedDependencies(Type classType, List<Log> interactions)
     {
         List<object> dependenciesList = new();
@@ -93,10 +77,18 @@ public class Replayer
                 {
                     var mocksList = from log in interactions
                                     where log.Entry.Class == classNameList.First()
-                                    select new MockObject(log.Entry.Method, log.Exit.Output);
+                                    select new MockObject(log.Id, log.Entry.Method, log.Exit.Output);
 
                     var mockInterceptor = new MockInterceptor(mocksList);
-                    var proxiedMock = proxyGenerator.CreateInterfaceProxyWithoutTarget(parameterType, mockInterceptor);
+                    object? proxiedMock = null;
+                    if (parameterType.IsInterface)
+                    {
+                        proxiedMock = proxyGenerator.CreateInterfaceProxyWithoutTarget(parameterType, mockInterceptor);
+                    }
+                    else
+                    {
+                        proxiedMock = proxyGenerator.CreateClassProxy(parameterType, mockInterceptor);
+                    }
                     dependenciesList.Add(proxiedMock);
                 }
                 else
