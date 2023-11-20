@@ -12,7 +12,7 @@ builder.Services.AddLogger()
     .WriteTo.File(filePath: "..\\Logging\\logs")
     .WriteTo.CustomSink<CustomSink>();
 
-builder.Services.AddLoggedScoped<ITestService, TestService>();
+builder.Services.AddLoggedScoped<TestService>();
 builder.Services.AddLoggedScoped<ITestRepository, TestRepository>();
 builder.Services.AddLoggedScoped<ITestRepository2, TestRepository2>();
 builder.Services.AddLoggedScoped<ITestAboveRepository, TestAboveRepository>();

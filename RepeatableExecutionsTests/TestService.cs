@@ -1,7 +1,7 @@
 ﻿using RepeatableExecutionsTests;
 using ILogger = Logging.Logging.Interceptors.ILogger;
 namespace Service;
-public class TestService : ITestService
+public class TestService
 {
     private readonly ITestRepository _repository;
     private readonly ITestRepository2 _repository2;
@@ -21,13 +21,17 @@ public class TestService : ITestService
     //    return "Test_Service";
     //}
 
-    public override string Test(string data, int number, TestObject obj)
+    //public override string Test(string data, int number, TestObject obj)
+    //{
+    //    return "Test_Service";
+    //}
+    //public override string testSucces()
+    //{
+    //    return "neoriginal!";
+    //}
+    public string testFailed()
     {
-        return "Test_Service";
-    }
-    public override string testSucces()
-    {
-        return "neoriginal!";
+        return "faild..";
     }
 }
 public abstract class ITestService

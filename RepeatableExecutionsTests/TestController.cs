@@ -10,9 +10,9 @@ namespace Tests.Objects;
 [Route("[controller]")]
 public class TestController : ControllerBase
 {
-    private ITestService _testService;
+    private TestService _testService;
     private ILogger _logger;
-    public TestController(ITestService testService, ILogger logger)
+    public TestController(TestService testService, ILogger logger)
     {
         _testService = testService;
         _logger = logger;
@@ -21,8 +21,8 @@ public class TestController : ControllerBase
     [ServiceFilter(typeof(StructuredLoggingAttribute))]
     public string GetWeatherEndpoint(string data, int number, [FromBody] TestObject obj)
     {
-        var result = _testService.Test(data, 1, obj);
-        var result1 = _testService.testSucces();
+        //var result = _testService.Test(data, 1, obj);
+        //var result1 = _testService.testSucces();
         var result2 = _testService.testFailed();
         return data + " " + number + " " + obj;
     }
