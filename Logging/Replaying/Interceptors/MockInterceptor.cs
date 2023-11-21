@@ -16,7 +16,7 @@ public class MockInterceptor : IInterceptor
         {
             if (mock.Method == invocation.Method.Name)
             {
-                invocation.ReturnValue = "testalesss"; //mock.Output; 
+                invocation.ReturnValue = mock.Output;
             }
         }
     }

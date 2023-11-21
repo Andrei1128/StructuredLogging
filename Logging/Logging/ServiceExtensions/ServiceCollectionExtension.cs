@@ -11,14 +11,22 @@ public static partial class ServiceCollectionExtensions
         where TService : class
         where TImplementation : class, TService
     => services.AddLoggedService<TService, TImplementation>(ServiceLifetime.Scoped);
+
     public static IServiceCollection AddLoggedTransient<TService, TImplementation>(this IServiceCollection services)
         where TService : class
         where TImplementation : class, TService
     => services.AddLoggedService<TService, TImplementation>(ServiceLifetime.Transient);
+
     private static IServiceCollection AddLoggedService<TService, TImplementation>(this IServiceCollection services, ServiceLifetime lifetime)
         where TService : class
         where TImplementation : class, TService
     {
+        if (!typeof(TService).IsInterface)
+            throw new InvalidOperationException($"`{typeof(TService).Name}` has to be a Interface!");
+
+        //if (!typeof(TImplementation).IsClass)
+        //    throw new InvalidOperationException($"`{typeof(TImplementation).Name}` has to be a Class!");
+
         services.Add(new ServiceDescriptor(typeof(TImplementation), typeof(TImplementation), lifetime));
         services.Add(ServiceDescriptor.Describe(
             typeof(TService),
@@ -28,14 +36,7 @@ public static partial class ServiceCollectionExtensions
                 var logInterceptor = provider.GetRequiredService<ILogger>();
                 var implementationInstance = provider.GetRequiredService<TImplementation>();
                 TService? proxy = null;
-                if (typeof(TService).IsInterface)
-                {
-                    proxy = proxyGenerator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, logInterceptor);
-                }
-                else
-                {
-                    proxy = proxyGenerator.CreateClassProxyWithTarget<TService>(implementationInstance, logInterceptor);
-                }
+                proxy = proxyGenerator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, logInterceptor);
                 return proxy;
             },
             lifetime

@@ -1,14 +1,14 @@
-﻿using ILogger = Logging.Logging.Interceptors.ILogger;
-
-namespace RepeatableExecutionsTests;
+﻿namespace RepeatableExecutionsTests;
 public class TestRepository : ITestRepository
 {
     private readonly ITestAboveRepository _aboveRepository;
-    private readonly ILogger _logger;
-    public TestRepository(ITestAboveRepository aboveRepository, ILogger logger)
+    //private readonly ILogger _logger;
+    public TestRepository(ITestAboveRepository aboveRepository
+        //, ILogger logger
+        )
     {
         _aboveRepository = aboveRepository;
-        _logger = logger;
+        //_logger = logger;
     }
     public (string, TestObject) Test(string data, TestObject obj)
     {
