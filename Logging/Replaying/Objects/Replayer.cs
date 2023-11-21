@@ -14,6 +14,7 @@ public class Replayer
     {
         string serializedLog = File.ReadAllText("C:\\Users\\Andrei\\Facultate\\C#\\RepeatableExecutionsTests\\Logging\\logs\\GetWeatherEndpoint-202311211829502569398");
         var jsonSettings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
+
         Log log = JsonConvert.DeserializeObject<Log>(serializedLog, jsonSettings);
 
         Type classType = Type.GetType(log.Entry.Class);
