@@ -22,6 +22,7 @@ public class TestController : ControllerBase
     public string GetWeatherEndpoint(string data, int number, [FromBody] TestObject obj)
     {
         var result = _testService.Test(data, 1, obj);
+        _testService.Test("Andrei", 28, null);
         return data + " " + number + " " + obj;
     }
     [HttpGet]

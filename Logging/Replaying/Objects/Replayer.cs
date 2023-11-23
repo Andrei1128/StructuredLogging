@@ -12,7 +12,7 @@ public class Replayer
     private readonly ProxyGenerator proxyGenerator = new();
     public void ReplayFull()
     {
-        string serializedLog = File.ReadAllText("C:\\Users\\Andrei\\Facultate\\C#\\RepeatableExecutionsTests\\Logging\\logs\\GetWeatherEndpoint-202311211829502569398");
+        string serializedLog = File.ReadAllText("C:\\Users\\Andrei\\Facultate\\C#\\RepeatableExecutionsTests\\Logging\\logs\\GetWeatherEndpoint-202311232026501458082");
         var jsonSettings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
 
         Log log = JsonConvert.DeserializeObject<Log>(serializedLog, jsonSettings);
@@ -51,6 +51,22 @@ public class Replayer
             foreach (var parameter in filteredConstructorParameters)
             {
                 Type parameterType = parameter.ParameterType;
+                Type genericMockType = typeof(Mock<>).MakeGenericType(parameterType);
+
+                var mock = Activator.CreateInstance(genericMockType);
+                dependencies.Add(((Mock)mock).Object);
+            }
+        }
+
+        if (constructorParameters.Any())
+        {
+            var filteredConstructorParameters = from param in constructorParameters
+                                                where dependencies.Any(x => param.ParameterType.IsAssignableFrom(x.GetType()))
+                                                select param;
+
+            foreach (var parameter in filteredConstructorParameters)
+            {
+                Type parameterType = parameter.ParameterType;
 
                 var classNameList = from _log in log.Interactions
                                     where parameterType.IsAssignableFrom(Type.GetType(_log.Entry.Class))
@@ -66,17 +82,8 @@ public class Replayer
                     object? proxiedMock = proxyGenerator.CreateInterfaceProxyWithoutTarget(parameterType, mockInterceptor);
                     dependencies.Add(proxiedMock);
                 }
-                else
-                {
-                    Type genericMockType = typeof(Mock<>).MakeGenericType(parameterType);
-                    var mock = Activator.CreateInstance(genericMockType);
-                    dependencies.Add(((Mock)mock).Object);
-
-                }
             }
         }
-
-
 
         if (dependencies.Any())
         {
