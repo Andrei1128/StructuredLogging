@@ -51,22 +51,6 @@ public class Replayer
             foreach (var parameter in filteredConstructorParameters)
             {
                 Type parameterType = parameter.ParameterType;
-                Type genericMockType = typeof(Mock<>).MakeGenericType(parameterType);
-
-                var mock = Activator.CreateInstance(genericMockType);
-                dependencies.Add(((Mock)mock).Object);
-            }
-        }
-
-        if (constructorParameters.Any())
-        {
-            var filteredConstructorParameters = from param in constructorParameters
-                                                where dependencies.Any(x => param.ParameterType.IsAssignableFrom(x.GetType()))
-                                                select param;
-
-            foreach (var parameter in filteredConstructorParameters)
-            {
-                Type parameterType = parameter.ParameterType;
 
                 var classNameList = from _log in log.Interactions
                                     where parameterType.IsAssignableFrom(Type.GetType(_log.Entry.Class))
@@ -82,8 +66,17 @@ public class Replayer
                     object? proxiedMock = proxyGenerator.CreateInterfaceProxyWithoutTarget(parameterType, mockInterceptor);
                     dependencies.Add(proxiedMock);
                 }
+                else
+                {
+                    Type genericMockType = typeof(Mock<>).MakeGenericType(parameterType);
+                    var mock = Activator.CreateInstance(genericMockType);
+                    dependencies.Add(((Mock)mock).Object);
+
+                }
             }
         }
+
+
 
         if (dependencies.Any())
         {
